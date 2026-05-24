@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import multer from "multer";
 import { GoogleGenAI } from "@google/genai";
-import pdfParse from "pdf-parse";
+import { PDFParse } from "pdf-parse";
 import { createServer as createViteServer } from "vite";
 import fs from "fs";
 
@@ -53,7 +53,7 @@ async function startServer() {
       const prompt = `Perform a comprehensive OSINT and safety analysis on this URL: ${url}.`;
       
       const response = await getAi().models.generateContent({
-        model: "gemini-3.1-flash",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: { 
           responseMimeType: "application/json",
@@ -137,7 +137,7 @@ async function startServer() {
       Return ONLY valid JSON. Keep analysis fast and concise.`;
       
       const response = await getAi().models.generateContent({
-        model: "gemini-3.1-flash",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: { responseMimeType: "application/json" }
       });
@@ -163,9 +163,11 @@ async function startServer() {
         return res.status(400).json({ error: "No file uploaded" });
       }
       
-      // Basic PDF text extraction using pdf-parse for reliability and speed
-      const data = await pdfParse(req.file.buffer);
-      res.json({ text: data.text, numPages: data.numpages });
+      const parser = new PDFParse({ data: new Uint8Array(req.file.buffer) });
+      const textData = await parser.getText();
+      const numPages = (await parser.getInfo()).total;
+      
+      res.json({ text: textData.text || "", numPages });
     } catch (error: any) {
       console.error("PDF parse error:", error);
       res.status(500).json({ error: error.message || "Failed to parse PDF" });
@@ -179,7 +181,7 @@ async function startServer() {
       const prompt = `Here is extracted text from a PDF file:\n\n${text.substring(0, 50000)}\n\nBased ONLY on the text above, answer the following question in easy English: ${question}`;
       
       const response = await getAi().models.generateContent({
-        model: "gemini-3.1-flash",
+        model: "gemini-2.5-flash",
         contents: prompt,
       });
       
@@ -196,7 +198,7 @@ async function startServer() {
       const prompt = `Extract all tabular data, lists, or structured records from this text into a single cohesive table format. Return the response strictly as a JSON array of arrays of strings (e.g., [["Name", "Age"], ["Alice", "25"]]). If there is no tabular data, try to structure the most important facts as a table. If absolutely no structure is possible, return [["Message"], ["No structured data found in the document"]].\n\nText:\n${text.substring(0, 50000)}`;
 
       const response = await getAi().models.generateContent({
-        model: "gemini-3.1-flash",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: { responseMimeType: "application/json" }
       });
@@ -216,7 +218,7 @@ async function startServer() {
       const prompt = `Analyze this QR code text (often UPI or URL): ${qrText}. If it is a UPI URI, extract the payee name, bank name (if possible from VPA), and indicate safety. Provide a JSON response with: "isSafe" (boolean), "payeeName" (string), "bankDetails" (string), "upiId" (string), "explanation" (detail in easy English). Return ONLY JSON.`;
       
       const response = await getAi().models.generateContent({
-        model: "gemini-3.1-flash",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: { responseMimeType: "application/json" }
       });
@@ -270,7 +272,7 @@ async function startServer() {
       }
 
       const response = await getAi().models.generateContent({
-        model: "gemini-3.1-flash",
+        model: "gemini-2.5-flash",
         contents: contents,
         config: { responseMimeType: "application/json" }
       });
