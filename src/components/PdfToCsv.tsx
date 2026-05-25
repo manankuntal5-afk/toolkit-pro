@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { FileType2, UploadCloud, MessageCircle, FileDown, Loader2, Table as TableIcon } from 'lucide-react';
+import { FileType2, UploadCloud, MessageCircle, FileDown, Loader2, Table as TableIcon, RefreshCw, X } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 export default function PdfToCsv() {
@@ -16,6 +16,17 @@ export default function PdfToCsv() {
   const [chatLoading, setChatLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const resetState = () => {
+    setFile(null);
+    setPdfText('');
+    setTableData(null);
+    setChatLog([]);
+    setQuestion('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
@@ -31,57 +42,70 @@ export default function PdfToCsv() {
     formData.append('file', selected);
     
     try {
-      const res = await fetch('/api/parse-pdf', {
+      // 1. Text Extraction (Fast)
+      const textPromise = fetch('/api/parse-pdf', {
         method: 'POST',
         body: formData
       });
-      const data = await res.json();
-      if(res.ok && data.text) {
-        setPdfText(data.text);
-        
-        // Auto extract table data
-        try {
-          const resTable = await fetch('/api/extract-table-pdf', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: data.text })
-          });
-          const tableResult = await resTable.json();
-          if (resTable.ok && tableResult.table && Array.isArray(tableResult.table)) {
-            // Normalize to string[][] to prevent crashes
-            const normalized = tableResult.table.map((row: any) => 
-               Array.isArray(row) ? row.map(String) : (typeof row === 'object' && row !== null ? Object.values(row).map(String) : [String(row)])
-            );
-            setTableData(normalized);
-          } else {
-            console.error("No table found or error extracting it.");
-            // Set empty array so preview shows empty rather than the button
-            setTableData([["Message"], ["No structured tabular data could be found in the document."]]);
-          }
-        } catch (tableErr) {
-          console.error(tableErr);
-          setTableData([["Error"], ["Failed to extract data table due to a network or server error."]]);
-        }
+
+      // 2. Table Extraction (Direct from PDF via Gemini Native)
+      const tablePromise = fetch('/api/extract-table-file', {
+        method: 'POST',
+        body: formData
+      });
+
+      // Wait for TEXT to finish so Chat gets unlocked quickly
+      const textRes = await textPromise;
+      const textData = await textRes.json();
+      if(textRes.ok && textData.text) {
+        setPdfText(textData.text);
       } else {
-        alert(data.error || "Failed to process the PDF document.");
+        alert(textData.error || "Failed to process the PDF document text.");
       }
+      setLoading(false);
+
+      // Meanwhile, wait for TABLE to finish
+      try {
+        const tableRes = await tablePromise;
+        const tableResult = await tableRes.json();
+        
+        if (tableRes.ok && tableResult.table && Array.isArray(tableResult.table)) {
+          const normalized = tableResult.table.map((row: any) => 
+             Array.isArray(row) ? row.map(String) : (typeof row === 'object' && row !== null ? Object.values(row).map(String) : [String(row)])
+          );
+          setTableData(normalized);
+        } else {
+          setTableData([["Error"], [tableResult.error || "No structured tabular data could be found in the document."]]);
+        }
+      } catch (tableErr) {
+        console.error(tableErr);
+        setTableData([["Error"], ["Failed to extract data table due to a network or server error."]]);
+      } finally {
+        setExtractingTable(false);
+      }
+
     } catch (err) {
       console.error(err);
       alert("Error uploading or processing PDF.");
-    } finally {
       setLoading(false);
       setExtractingTable(false);
+    }
+    
+    // Clear input so same file can be uploaded again if needed
+    if (e.target) {
+      e.target.value = '';
     }
   };
 
   const extractTableData = async () => {
-    if (!pdfText) return;
+    if (!file) return;
     setExtractingTable(true);
+    const formData = new FormData();
+    formData.append('file', file);
     try {
-      const res = await fetch('/api/extract-table-pdf', {
+      const res = await fetch('/api/extract-table-file', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: pdfText })
+        body: formData
       });
       const data = await res.json();
       if (res.ok && data.table && Array.isArray(data.table)) {
@@ -191,7 +215,14 @@ export default function PdfToCsv() {
                  </div>
               ) : (
                 <div className="flex-1 flex flex-col bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
-                  <div className="p-6 border-b border-slate-200 text-center bg-white">
+                  <div className="p-6 border-b border-slate-200 text-center bg-white relative">
+                    <button 
+                      onClick={resetState}
+                      className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+                      title="Upload Another File"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
                     <FileType2 className="w-10 h-10 text-blue-500 mx-auto mb-3" />
                     <h3 className="text-lg font-bold text-slate-900 truncate px-4">{file.name}</h3>
                     <p className="text-slate-500 text-sm">{(file.size / 1024 / 1024).toFixed(2)} MB • Ready</p>
@@ -201,9 +232,9 @@ export default function PdfToCsv() {
                     {!tableData ? (
                       <div className="flex-1 flex flex-col items-center justify-center">
                         {extractingTable ? (
-                          <div className="text-center">
+                          <div className="text-center p-8">
                             <Loader2 className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-3" />
-                            <p className="text-slate-600 text-sm font-medium">AI is structuring the data into a table...</p>
+                            <p className="text-slate-600 text-sm font-medium">Extracting data into a table...</p>
                           </div>
                         ) : (
                           <button 
@@ -216,28 +247,43 @@ export default function PdfToCsv() {
                         )}
                       </div>
                     ) : (
-                      <div className="flex-1 flex flex-col max-h-[300px]">
+                      <div className="flex-1 flex flex-col mt-4">
                         <div className="flex items-center justify-between mb-4">
-                          <h4 className="font-semibold text-slate-800">Extracted Data Preview</h4>
+                          <h4 className="font-semibold text-slate-800 flex items-center gap-2">
+                             Extracted Data Preview
+                             {extractingTable && <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />}
+                          </h4>
                           <div className="flex gap-2">
-                             <button onClick={handleDownloadCSV} className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-800 rounded-md text-sm font-medium transition-colors">
+                             <button onClick={handleDownloadCSV} className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-800 rounded-md text-sm font-medium transition-colors border border-green-200 shadow-sm">
                                <FileDown className="w-4 h-4" /> CSV
                              </button>
-                             <button onClick={handleDownloadExcel} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm font-medium transition-colors">
-                               <FileDown className="w-4 h-4" /> Excel (.xlsx)
+                             <button onClick={handleDownloadExcel} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm font-medium transition-colors shadow-sm">
+                               <FileDown className="w-4 h-4" /> Excel
                              </button>
                           </div>
                         </div>
-                        <div className="flex-1 overflow-auto border border-slate-200 rounded-lg bg-white shadow-inner">
-                          <table className="w-full text-sm text-left text-slate-600">
+                        <div className="flex-1 overflow-auto border border-slate-200 rounded-lg bg-white shadow-inner relative" style={{ maxHeight: 'calc(100vh - 350px)', minHeight: '300px' }}>
+                          <table className="w-full text-sm text-left text-slate-600 min-w-max">
+                            <thead className="bg-slate-100 text-slate-800 sticky top-0 z-10 shadow-sm">
+                              <tr>
+                                {Array.isArray(tableData) && tableData.length > 0 && 
+                                  (Array.isArray(tableData[0]) ? tableData[0] : (typeof tableData[0] === 'object' && tableData[0] !== null ? Object.values(tableData[0]) : [String(tableData[0])]))
+                                  .map((h, i) => (
+                                    <th key={i} className="px-4 py-3 border-b-2 border-slate-200 font-semibold whitespace-nowrap">
+                                        {typeof h === 'object' ? JSON.stringify(h) : String(h)}
+                                    </th>
+                                  ))
+                                }
+                              </tr>
+                            </thead>
                             <tbody>
-                              {Array.isArray(tableData) && tableData.map((row, rI) => {
+                              {Array.isArray(tableData) && tableData.slice(1).map((row, rI) => {
                                 // If row is not an array, convert object to array of its values
                                 const cells = Array.isArray(row) ? row : (typeof row === 'object' && row !== null ? Object.values(row) : [String(row)]);
                                 return (
-                                <tr key={rI} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                                <tr key={rI} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
                                   {cells.map((cell, cI) => (
-                                    <td key={cI} className={`px-4 py-2 ${rI === 0 ? 'bg-slate-100 font-semibold text-slate-800 border-b-2 border-slate-200' : ''}`}>
+                                    <td key={cI} className="px-4 py-2 whitespace-nowrap">
                                       {typeof cell === 'object' ? JSON.stringify(cell) : String(cell)}
                                     </td>
                                   ))}

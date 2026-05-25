@@ -3,6 +3,7 @@ import path from "path";
 import multer from "multer";
 import { GoogleGenAI } from "@google/genai";
 import { PDFParse } from "pdf-parse";
+import PDFParser from "pdf2json";
 import { createServer as createViteServer } from "vite";
 import fs from "fs";
 
@@ -171,6 +172,117 @@ async function startServer() {
     } catch (error: any) {
       console.error("PDF parse error:", error);
       res.status(500).json({ error: error.message || "Failed to parse PDF" });
+    }
+  });
+
+  app.post("/api/extract-table-file", upload.single("file"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const allRows = await new Promise((resolve, reject) => {
+        const pdfParser = new PDFParser();
+        
+        pdfParser.on("pdfParser_dataError", (errData: any) => reject(errData.parserError));
+        pdfParser.on("pdfParser_dataReady", (pdfData: any) => {
+            let extractedRows: string[][] = [];
+            
+            for (let p = 0; p < pdfData.Pages.length; p++) {
+                const page = pdfData.Pages[p];
+                const rowMap = new Map();
+                
+                for (const text of page.Texts) {
+                    if (!text.R || text.R.length === 0) continue;
+                    let str = decodeURIComponent(text.R[0].T);
+                    if (!str || str.trim() === "") continue;
+                    
+                    const x = text.x;
+                    const y = text.y;
+                    
+                    // Group vertically (within 0.5 units) to account for tiny layout shifts
+                    const iterY = Math.round(y * 2) / 2;
+                    if (!rowMap.has(iterY)) {
+                        rowMap.set(iterY, []);
+                    }
+                    rowMap.get(iterY).push({ str: str.trim(), x: x });
+                }
+                
+                // Sort by Y ascending
+                const sortedY = Array.from(rowMap.keys()).sort((a, b) => a - b);
+                let pageRows = [];
+                for (const y of sortedY) {
+                    const rowItems = rowMap.get(y);
+                    rowItems.sort((a, b) => a.x - b.x); // sort by X ascending
+                    pageRows.push(rowItems);
+                }
+
+                // Build unified X grid for columns to align perfectly
+                const xPositions = new Set<number>();
+                for (const row of pageRows) {
+                    for (const item of row) {
+                        // Round X to 1 decimal place to capture tight columns
+                        xPositions.add(Math.round(item.x * 10) / 10);
+                    }
+                }
+                
+                let columns = Array.from(xPositions).sort((a: number, b: number) => a - b);
+                
+                // Merge columns that are closely spaced
+                let groupedColumns: number[] = [];
+                for (const col of columns) {
+                    if (groupedColumns.length === 0) {
+                        groupedColumns.push(col);
+                    } else {
+                        const prev = groupedColumns[groupedColumns.length - 1];
+                        if (col - prev > 0.4) { // 0.4 units minimum separation avoids merging distinct columns
+                            groupedColumns.push(col);
+                        }
+                    }
+                }
+
+                if (groupedColumns.length === 0) groupedColumns = [0];
+
+                for (const row of pageRows) {
+                    const finalRow = new Array(groupedColumns.length).fill("");
+                    
+                    for (const item of row) {
+                        let bestColIndex = 0;
+                        let minDiff = Infinity;
+                        for (let i = 0; i < groupedColumns.length; i++) {
+                            const diff = Math.abs(item.x - groupedColumns[i]);
+                            if (diff < minDiff) {
+                                minDiff = diff;
+                                bestColIndex = i;
+                            }
+                        }
+                        
+                        if (finalRow[bestColIndex] !== "") {
+                            finalRow[bestColIndex] += " " + item.str;
+                        } else {
+                            finalRow[bestColIndex] = item.str;
+                        }
+                    }
+                    if (finalRow.some(cell => cell.trim() !== "")) {
+                        extractedRows.push(finalRow);
+                    }
+                }
+                extractedRows.push([]); // spacer between pages
+            }
+            resolve(extractedRows);
+        });
+        
+        pdfParser.parseBuffer(req.file.buffer);
+      });
+
+      if ((allRows as any[]).length === 0) {
+         return res.json({ table: [["Message"], ["No structured data found in the document"]] });
+      }
+
+      return res.json({ table: allRows });
+    } catch (error: any) {
+      console.error("PDF table extraction error:", error);
+      res.status(500).json({ error: error.message || "Failed to extract table" });
     }
   });
 
