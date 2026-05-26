@@ -23,6 +23,7 @@ import YoutubeRecipe from './components/YoutubeRecipe';
 import TowedVehicleFinder from './components/TowedVehicleFinder';
 import DigitalFootprint from './components/DigitalFootprint';
 import BankDecoder from './components/BankDecoder';
+import Blog from './components/Blog';
 import { TOOLS } from './constants';
 
 function Placeholder({ title }: { title: string }) {
@@ -58,6 +59,7 @@ export default function App() {
           <Route path="/towed-vehicle-finder" element={<TowedVehicleFinder />} />
           <Route path="/digital-footprint" element={<DigitalFootprint />} />
           <Route path="/bank-decoder" element={<BankDecoder />} />
+          <Route path="/blog" element={<Blog />} />
           
           {/* Other tool placeholders */}
           {TOOLS.filter(t => !['common-data-finder', 'chat-to-pdf', 'geo-map-animator', 'safe-link-scanner', 'pdf-to-csv', 'image-compressor', 'qr-checker', 'fake-social-checker', 'photo-metadata', 'whatsapp-checker', 'pdf-redactor', 'image-enhancer', 'document-translator', 'trip-calculator', 'brand-size-converter', 'youtube-recipe', 'towed-vehicle-finder', 'digital-footprint', 'bank-decoder'].includes(t.id)).map(tool => (

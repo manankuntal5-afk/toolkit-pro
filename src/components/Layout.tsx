@@ -3,6 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { TOOLS } from '../constants';
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { SEO_DATA } from './seoData';
+import { SEOArticle } from './SEOArticle';
+import { useSEO } from '../hooks/useSEO';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -10,6 +13,12 @@ export function cn(...inputs: ClassValue[]) {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+  const seoInfo = SEO_DATA[location.pathname];
+  
+  useSEO(
+    seoInfo?.seoTitle || "ToolBox Pro - Free Online Utility Tools",
+    seoInfo?.seoDescription || "Collection of free online OSINT and utility tools for everyday tasks."
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -55,6 +64,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </Link>
                 )
               })}
+              <Link to="/blog" className="flex items-center px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors text-slate-800 hover:bg-slate-100 font-bold bg-slate-50 border border-slate-200 ml-2">
+                📖 Tutorials / Blog
+              </Link>
             </nav>
           </div>
         </div>
@@ -62,6 +74,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
+        
+        {seoInfo && location.pathname !== '/blog' && (
+          <SEOArticle 
+            title={seoInfo.h2} 
+            content={seoInfo.content} 
+            keywords={seoInfo.keywords} 
+          />
+        )}
         
         {/* Tool Grid at bottom as requested */}
         <div className="mt-16 border-t border-slate-200 pt-12">
