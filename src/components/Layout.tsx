@@ -13,12 +13,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 pt-2 pb-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <Link to="/" className="text-xl font-bold text-blue-600 flex-shrink-0">
-              ToolBox Pro
-            </Link>
+            <div className="flex flex-col">
+               <Link to="/" className="text-xl font-bold text-blue-600 flex-shrink-0">
+                 ToolBox Pro
+               </Link>
+               <button 
+                 onClick={() => {
+                   const currentKey = localStorage.getItem('gemini_api_key') || '';
+                   const newKey = window.prompt("Enter your personal Gemini API Key if you are experiencing rate limits:", currentKey);
+                   if (newKey !== null) {
+                     localStorage.setItem('gemini_api_key', newKey.trim());
+                     alert('API Key saved successfully!');
+                   }
+                 }}
+                 className="text-xs text-slate-500 hover:text-blue-600 text-left underline decoration-dotted underline-offset-2 w-fit mt-1 pb-1 cursor-pointer"
+               >
+                 Set Custom API Key
+               </button>
+            </div>
             <nav className="hidden md:flex space-x-1 lg:space-x-2 overflow-x-auto pb-2 -mb-2 custom-scrollbar">
               {TOOLS.map((tool) => {
                 const Icon = tool.icon;

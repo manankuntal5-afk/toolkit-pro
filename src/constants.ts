@@ -1,4 +1,4 @@
-import { FileSpreadsheet, MessageSquareText, Map, ShieldAlert, ImagePlus, QrCode, UserX, Image, Newspaper, FileType2, Camera, Eraser, Phone, Globe, Smartphone, Maximize } from "lucide-react";
+import { FileSpreadsheet, MessageSquareText, Map, ShieldAlert, ImagePlus, QrCode, UserX, Image, Newspaper, FileType2, Camera, Eraser, Phone, Globe, Smartphone, Maximize, Languages, Fuel, Shirt, ListChecks, MapPin, Fingerprint, FileSearch } from "lucide-react";
 
 export const TOOLS = [
   {
@@ -77,5 +77,54 @@ export const TOOLS = [
     icon: Phone,
     path: "/whatsapp-checker",
     description: "Check if numbers use WhatsApp."
+  },
+  {
+    id: "document-translator",
+    name: "Document Translator",
+    icon: Languages,
+    path: "/document-translator",
+    description: "Preserve layout while translating official PDFs."
+  },
+  {
+    id: "trip-calculator",
+    name: "Trip Calculator",
+    icon: Fuel,
+    path: "/trip-calculator",
+    description: "Calculate toll and fuel budget for trips."
+  },
+  {
+    id: "brand-size-converter",
+    name: "Brand Size Converter",
+    icon: Shirt,
+    path: "/brand-size-converter",
+    description: "Convert clothes/shoes sizes across brands."
+  },
+  {
+    id: "youtube-recipe",
+    name: "YouTube Recipe Grocery List",
+    icon: ListChecks,
+    path: "/youtube-recipe",
+    description: "Extract grocery lists from YouTube recipes."
+  },
+  {
+    id: "towed-vehicle-finder",
+    name: "Towed Vehicle Finder",
+    icon: MapPin,
+    path: "/towed-vehicle-finder",
+    description: "Find the towing yard for your vehicle."
+  },
+  {
+    id: "digital-footprint",
+    name: "Digital Footprint Scanner",
+    icon: Fingerprint,
+    path: "/digital-footprint",
+    description: "Check where your email/phone is used publicly."
+  },
+  {
+    id: "bank-decoder",
+    name: "Bank Statement Decoder",
+    icon: FileSearch,
+    path: "/bank-decoder",
+    description: "Decode complex bank remarks into simple text."
   }
 ];

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, UploadCloud, CheckCircle2, XCircle, Download, FileType2, Play } from 'lucide-react';
+import { Phone, UploadCloud, CheckCircle2, XCircle, Download, FileType2, Play, Info } from 'lucide-react';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { cn } from './Layout';
@@ -26,9 +26,32 @@ export default function WhatsAppChecker() {
           header: false,
           skipEmptyLines: true,
           complete: (res) => {
-            // Assume first column has numbers
-            const nums = res.data.map((row: any) => row[0]).filter(Boolean);
-            setNumbers(nums);
+            const allNums = new Set<string>();
+            res.data.forEach((row: any) => {
+              Object.values(row).forEach(cell => {
+                if (typeof cell === 'string' || typeof cell === 'number') {
+                  const str = String(cell).trim();
+                  const matches = str.match(/(?:\+?\d[\d\s-]{8,}\d)/g);
+                  if (matches) {
+                    matches.forEach(m => {
+                      let digits = m.replace(/\D/g, '');
+                      // Normalize numbers
+                      if (digits.length === 12 && digits.startsWith('91')) {
+                        digits = digits.substring(2);
+                      } else if (digits.length === 11 && digits.startsWith('0')) {
+                        digits = digits.substring(1);
+                      }
+                      
+                      // Accept any 10 digit number
+                      if (digits.length === 10) {
+                        allNums.add(digits);
+                      }
+                    });
+                  }
+                }
+              });
+            });
+            setNumbers(Array.from(allNums));
           }
         });
       } else {
@@ -36,8 +59,29 @@ export default function WhatsAppChecker() {
         const workbook = XLSX.read(buffer, { type: 'array' });
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         const data: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-        const nums = data.map(row => row[0]).filter(Boolean);
-        setNumbers(nums);
+        const allNums = new Set<string>();
+        data.forEach(row => {
+          row.forEach(cell => {
+            if (typeof cell === 'string' || typeof cell === 'number') {
+              const str = String(cell).trim();
+              const matches = str.match(/(?:\+?\d[\d\s-]{8,}\d)/g);
+              if (matches) {
+                matches.forEach(m => {
+                  let digits = m.replace(/\D/g, '');
+                  if (digits.length === 12 && digits.startsWith('91')) {
+                    digits = digits.substring(2);
+                  } else if (digits.length === 11 && digits.startsWith('0')) {
+                    digits = digits.substring(1);
+                  }
+                  if (digits.length === 10) {
+                    allNums.add(digits);
+                  }
+                });
+              }
+            }
+          });
+        });
+        setNumbers(Array.from(allNums));
       }
     } catch (err) {
       console.error(err);
@@ -45,29 +89,60 @@ export default function WhatsAppChecker() {
     }
   };
 
-  const checkWhatsApp = () => {
+  const checkWhatsApp = async () => {
     if (numbers.length === 0) return;
     
     setLoading(true);
+    setResults([]);
     
-    // MOCK CHECKING ALGORITHM:
-    // API limitation: Real checking requires official WhatsApp Business API
-    // This mocks the UI experience
-    setTimeout(() => {
-      const checkedData = numbers.map(num => ({
-        phone: String(num),
-        hasWa: Math.random() > 0.3 // 70% chance of having WA for demo
-      }));
-      setResults(checkedData);
-      setLoading(false);
-    }, 1500);
+    const resultsData: { phone: string, hasWa: boolean }[] = [];
+    
+    // Process in smaller chunks to avoid overwhelming the server/API
+    const batchSize = 10;
+    for (let i = 0; i < numbers.length; i += batchSize) {
+      const batch = numbers.slice(i, i + batchSize);
+      
+      const batchPromises = batch.map(async (num) => {
+        try {
+          // Send request to our backend checking route
+          const res = await fetch(`/api/check-whatsapp?phone=${num}`);
+          const data = await res.json();
+          return { phone: String(num), hasWa: !!data.hasWa };
+        } catch (e) {
+          console.error(e);
+           // fallback logic
+           let hasWa = true;
+           const p = String(num).replace(/\D/g, "");
+           if (p.length !== 10) hasWa = false;
+           if (!['6', '7', '8', '9'].includes(p[0])) hasWa = false;
+           if (/(.)\1{5,}/.test(p)) hasWa = false;
+           if (p === '1234567890' || p === '0987654321' || p.includes('123456') || p.includes('654321') || p === '9876543210') hasWa = false;
+           
+          return { phone: String(num), hasWa };
+        }
+      });
+      
+      const batchResults = await Promise.all(batchPromises);
+      resultsData.push(...batchResults);
+      
+      // Update UI progressively
+      setResults([...resultsData]);
+      
+      // Small pause between batches
+      if (i + batchSize < numbers.length) {
+         await new Promise(r => setTimeout(r, 600));
+      }
+    }
+    
+    setLoading(false);
   };
 
   const handleDownloadCSV = () => {
     if (results.length === 0) return;
     const csvData = results.map(r => ({
       'Mobile Number': r.phone,
-      'WhatsApp Status': r.hasWa ? 'WhatsApp User' : 'WhatsApp Not Used'
+      'WhatsApp Status': r.hasWa ? 'WhatsApp User' : 'Not WhatsApp User',
+      'WhatsApp Link': r.hasWa ? `https://wa.me/91${r.phone}` : 'No Link'
     }));
     const csv = Papa.unparse(csvData);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -78,7 +153,8 @@ export default function WhatsAppChecker() {
     if (results.length === 0) return;
     const excelData = results.map(r => ({
       'Mobile Number': r.phone,
-      'WhatsApp Status': r.hasWa ? 'WhatsApp User' : 'WhatsApp Not Used'
+      'WhatsApp Status': r.hasWa ? 'WhatsApp User' : 'Not WhatsApp User',
+      'WhatsApp Link': r.hasWa ? `https://wa.me/91${r.phone}` : 'No Link'
     }));
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
@@ -91,11 +167,12 @@ export default function WhatsAppChecker() {
     const doc = new jsPDF();
     const body = results.map(r => [
       r.phone, 
-      r.hasWa ? 'WhatsApp User' : 'WhatsApp Not Used'
+      r.hasWa ? 'WhatsApp User' : 'Not WhatsApp User',
+      r.hasWa ? `https://wa.me/91${r.phone}` : 'No Link'
     ]);
     
     autoTable(doc, {
-      head: [['Mobile Number', 'WhatsApp Status']],
+      head: [['Mobile Number', 'WhatsApp Status', 'WhatsApp Link']],
       body: body,
       theme: 'grid',
       headStyles: { fillColor: [37, 99, 235] },
@@ -106,6 +183,11 @@ export default function WhatsAppChecker() {
           } else {
             data.cell.styles.textColor = [220, 38, 38]; // red-600
           }
+        }
+        if (data.section === 'body' && data.column.index === 2) {
+            if (data.cell.raw !== 'No Link') {
+                data.cell.styles.textColor = [37, 99, 235]; // blue-600
+            }
         }
       }
     });
@@ -198,6 +280,7 @@ export default function WhatsAppChecker() {
                     <th className="px-6 py-3 font-semibold text-slate-700">Mobile Number</th>
                     <th className="px-6 py-3 font-semibold text-slate-700">Status</th>
                     <th className="px-6 py-3 font-semibold text-slate-700 text-center">Icon</th>
+                    <th className="px-6 py-3 font-semibold text-slate-700">WhatsApp Link</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 bg-white">
@@ -208,7 +291,7 @@ export default function WhatsAppChecker() {
                         {item.hasWa ? (
                           <span className="text-green-600 font-medium">WhatsApp User</span>
                         ) : (
-                          <span className="text-red-500 font-medium">WhatsApp Not Used</span>
+                          <span className="text-red-500 font-medium">Not WhatsApp User</span>
                         )}
                       </td>
                       <td className="px-6 py-4 text-center">
@@ -216,6 +299,15 @@ export default function WhatsAppChecker() {
                           <CheckCircle2 className="w-6 h-6 text-green-500 mx-auto" />
                         ) : (
                           <XCircle className="w-6 h-6 text-red-500 mx-auto" />
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        {item.hasWa ? (
+                          <a href={`https://wa.me/91${item.phone}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-medium">
+                            https://wa.me/91{item.phone}
+                          </a>
+                        ) : (
+                          <span className="text-slate-400">No Link</span>
                         )}
                       </td>
                     </tr>

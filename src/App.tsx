@@ -16,6 +16,13 @@ import WhatsAppChecker from './components/WhatsAppChecker';
 import PdfRedactor from './components/PdfRedactor';
 import ChatToPdf from './components/ChatToPdf';
 import GeoMapAnimator from './components/GeoMapAnimator';
+import DocumentTranslator from './components/DocumentTranslator';
+import TripCalculator from './components/TripCalculator';
+import BrandSizeConverter from './components/BrandSizeConverter';
+import YoutubeRecipe from './components/YoutubeRecipe';
+import TowedVehicleFinder from './components/TowedVehicleFinder';
+import DigitalFootprint from './components/DigitalFootprint';
+import BankDecoder from './components/BankDecoder';
 import { TOOLS } from './constants';
 
 function Placeholder({ title }: { title: string }) {
@@ -44,9 +51,16 @@ export default function App() {
           <Route path="/photo-metadata" element={<PhotoMetadata />} />
           <Route path="/whatsapp-checker" element={<WhatsAppChecker />} />
           <Route path="/pdf-redactor" element={<PdfRedactor />} />
+          <Route path="/document-translator" element={<DocumentTranslator />} />
+          <Route path="/trip-calculator" element={<TripCalculator />} />
+          <Route path="/brand-size-converter" element={<BrandSizeConverter />} />
+          <Route path="/youtube-recipe" element={<YoutubeRecipe />} />
+          <Route path="/towed-vehicle-finder" element={<TowedVehicleFinder />} />
+          <Route path="/digital-footprint" element={<DigitalFootprint />} />
+          <Route path="/bank-decoder" element={<BankDecoder />} />
           
           {/* Other tool placeholders */}
-          {TOOLS.filter(t => !['common-data-finder', 'chat-to-pdf', 'geo-map-animator', 'safe-link-scanner', 'pdf-to-csv', 'image-compressor', 'qr-checker', 'fake-social-checker', 'photo-metadata', 'whatsapp-checker', 'pdf-redactor', 'image-enhancer'].includes(t.id)).map(tool => (
+          {TOOLS.filter(t => !['common-data-finder', 'chat-to-pdf', 'geo-map-animator', 'safe-link-scanner', 'pdf-to-csv', 'image-compressor', 'qr-checker', 'fake-social-checker', 'photo-metadata', 'whatsapp-checker', 'pdf-redactor', 'image-enhancer', 'document-translator', 'trip-calculator', 'brand-size-converter', 'youtube-recipe', 'towed-vehicle-finder', 'digital-footprint', 'bank-decoder'].includes(t.id)).map(tool => (
             // @ts-ignore
             <Route key={tool.id} path={tool.path} element={<Placeholder title={tool.name} />} />
           ))}
