@@ -87,7 +87,7 @@ async function startServer() {
       const prompt = `Perform a comprehensive OSINT and safety analysis on this URL: ${url}.`;
       
       const response = await getAi(req).models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         contents: prompt,
         config: { 
           responseMimeType: "application/json",
@@ -171,7 +171,7 @@ async function startServer() {
       Return ONLY valid JSON. Keep analysis fast and concise.`;
       
       const response = await getAi(req).models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         contents: prompt,
         config: { responseMimeType: "application/json" }
       });
@@ -326,7 +326,7 @@ async function startServer() {
       const prompt = `Here is extracted text from a PDF file:\n\n${text.substring(0, 50000)}\n\nBased ONLY on the text above, answer the following question in easy English: ${question}`;
       
       const response = await getAi(req).models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         contents: prompt,
       });
       
@@ -343,7 +343,7 @@ async function startServer() {
       const prompt = `Extract all tabular data, lists, or structured records from this text into a single cohesive table format. Return the response strictly as a JSON array of arrays of strings (e.g., [["Name", "Age"], ["Alice", "25"]]). If there is no tabular data, try to structure the most important facts as a table. If absolutely no structure is possible, return [["Message"], ["No structured data found in the document"]].\n\nText:\n${text.substring(0, 50000)}`;
 
       const response = await getAi(req).models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         contents: prompt,
         config: { responseMimeType: "application/json" }
       });
@@ -363,7 +363,7 @@ async function startServer() {
       const prompt = `Analyze this QR code text (often UPI or URL): ${qrText}. If it is a UPI URI, extract the payee name, bank name (if possible from VPA), and indicate safety. Provide a JSON response with: "isSafe" (boolean), "payeeName" (string), "bankDetails" (string), "upiId" (string), "explanation" (detail in easy English). Return ONLY JSON.`;
       
       const response = await getAi(req).models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         contents: prompt,
         config: { responseMimeType: "application/json" }
       });
@@ -417,7 +417,7 @@ async function startServer() {
       }
 
       const response = await getAi(req).models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         contents: contents,
         config: { responseMimeType: "application/json" }
       });
@@ -440,7 +440,7 @@ async function startServer() {
       "explanation" (A short, friendly explanation in very simple, easy-to-understand English).`;
       
       const response = await getAi(req).models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         contents: prompt,
         config: { responseMimeType: "application/json" }
       });
@@ -479,7 +479,7 @@ async function startServer() {
     while (retries > 0) {
       try {
         response = await getAi(req).models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-2.5-flash-lite",
           contents: prompt,
           config: { 
             tools: [{ googleSearch: {} }]
@@ -514,7 +514,8 @@ async function startServer() {
     try {
       const { name, email, phone } = req.body;
       const prompt = `You are an OSINT investigator. Perform a simulated public digital footprint scan for the following details: Name: ${name}, Email: ${email}, Phone: ${phone}.
-      Since you cannot do real-time deep web hacking, use Google Search to find if these details appear on public websites, forums, or directories. If no real data is found, simulate a realistic report of what platforms typically hold data for similar profiles.
+      Since you cannot do real-time deep web hacking, use Google Search to find if these details appear on public websites, forums, or directories. 
+      IMPORTANT INSTRUCTION: Extract EVERY SINGLE PIECE OF DATA YOU FIND, exhaustively. Do not omit anything. Provide as many findings as possible, as large as the data allows. Ensure to provide an exhaustive list of all identified mentions, links, and public profiles. If no real data is found, simulate a very detailed, exhaustive realistic report of what platforms typically hold data for similar profiles.
       Return a JSON response with:
       "findings" (array of objects with "platform" (string), "dataType" (string), "riskLevel" (High/Medium/Low, string), "description" (string in Hindi)),
       "summary" (string in Hindi summarizing the footprint visibility).
@@ -526,7 +527,7 @@ async function startServer() {
       while (retries > 0) {
         try {
           response = await getAi(req).models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-2.5-flash-lite",
             contents: prompt,
             config: { 
               tools: [{ googleSearch: {} }]
@@ -579,7 +580,7 @@ async function startServer() {
       "transactions" (array of objects with "originalRemark" (string), "date" (string if found), "amount" (string if found), "decodedMeaning" (string in Hindi, explaining the transaction simply)).`;
       
       const response = await getAi(req).models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         contents: prompt,
         config: { responseMimeType: "application/json" }
       });
@@ -629,7 +630,7 @@ async function startServer() {
       while (retries > 0) {
         try {
           response = await getAi(req).models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-2.5-flash-lite",
             contents: contents
           });
           break;
@@ -697,7 +698,7 @@ async function startServer() {
       while (retries > 0) {
         try {
           response = await getAi(req).models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-2.5-flash-lite",
             contents: contents
           });
           break;

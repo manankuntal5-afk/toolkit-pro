@@ -2,6 +2,13 @@ import { FileSpreadsheet, MessageSquareText, Map, ShieldAlert, ImagePlus, QrCode
 
 export const TOOLS = [
   {
+    id: "digital-footprint",
+    name: "Digital Footprint Scanner",
+    icon: Fingerprint,
+    path: "/digital-footprint",
+    description: "Check where your email/phone is used publicly."
+  },
+  {
     id: "common-data-finder",
     name: "Common Data Finder",
     icon: FileSpreadsheet,
@@ -112,13 +119,6 @@ export const TOOLS = [
     icon: MapPin,
     path: "/towed-vehicle-finder",
     description: "Find the towing yard for your vehicle."
-  },
-  {
-    id: "digital-footprint",
-    name: "Digital Footprint Scanner",
-    icon: Fingerprint,
-    path: "/digital-footprint",
-    description: "Check where your email/phone is used publicly."
   },
   {
     id: "bank-decoder",

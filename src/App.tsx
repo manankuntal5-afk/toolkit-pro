@@ -39,7 +39,7 @@ export default function App() {
     <BrowserRouter>
       <Layout>
         <Routes>
-          <Route path="/" element={<Navigate to="/pdf-to-csv" replace />} />
+          <Route path="/" element={<Navigate to="/digital-footprint" replace />} />
           <Route path="/common-data-finder" element={<CommonDataFinder />} />
           <Route path="/chat-to-pdf" element={<ChatToPdf />} />
           <Route path="/geo-map-animator" element={<GeoMapAnimator />} />
