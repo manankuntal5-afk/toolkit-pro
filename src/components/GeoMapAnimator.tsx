@@ -1063,17 +1063,38 @@ export default function GeoMapAnimator() {
       {/* Huge Keyword Banner for Home Page */}
       <div className="text-center mb-16 max-w-4xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
-          Excel to 3D Map Bulk Tracker
+          Plot and Animate Latitude Longitude Data from Excel on Google Maps
         </h1>
-        <p className="text-xl text-slate-600 leading-relaxed font-medium">
-          Instantly convert your spreadsheet data into beautiful, animated
-          geolocation maps.
-        </p>
+        <h2 className="text-xl text-slate-600 leading-relaxed font-medium">
+          Upload Excel to Track and Animate GPS Routes with Time Filters
+        </h2>
       </div>
 
       <div className="bg-white rounded-3xl shadow-xl shadow-slate-200 border border-slate-100 p-6 md:p-8 mb-12 relative overflow-hidden">
-        <div className="flex flex-col md:flex-row gap-6 mb-8 relative z-10">
-          <div className="flex-1 w-full relative group">
+        {/* Icons Above Upload Area */}
+        <div className="flex justify-center items-center gap-8 mb-6">
+          <div className="flex flex-col items-center gap-2 text-slate-600 transition-transform hover:scale-105 hover:text-blue-600 cursor-pointer">
+            <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-sm border border-blue-100">
+              <FileSpreadsheet className="w-7 h-7" />
+            </div>
+            <span className="font-semibold text-sm">CSV</span>
+          </div>
+          <div className="flex flex-col items-center gap-2 text-slate-600 transition-transform hover:scale-105 hover:text-green-600 cursor-pointer">
+            <div className="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center shadow-sm border border-green-100">
+              <FileSpreadsheet className="w-7 h-7" />
+            </div>
+            <span className="font-semibold text-sm">Excel</span>
+          </div>
+          <div className="flex flex-col items-center gap-2 text-slate-600 transition-transform hover:scale-105 hover:text-purple-600 cursor-pointer">
+            <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center shadow-sm border border-purple-100">
+              <FileSpreadsheet className="w-7 h-7" />
+            </div>
+            <span className="font-semibold text-sm">Spreadsheet</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-6 mb-8 relative z-10 w-full max-w-4xl mx-auto">
+          <div className="w-full relative group">
             <input
               type="file"
               onChange={handleFileUpload}
@@ -1082,25 +1103,46 @@ export default function GeoMapAnimator() {
             />
             <div
               className={cn(
-                "bg-[#2563eb] rounded-2xl w-full relative flex flex-col items-center justify-center p-12 cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:bg-[#1d4ed8] transition-all duration-300 overflow-hidden group border-4 border-transparent hover:border-white h-[280px]",
-                file && "bg-[#1d4ed8]",
+                "bg-[#11B3A5] rounded-lg w-full relative flex flex-col items-center justify-center p-8 sm:p-12 cursor-pointer transition-all duration-300 overflow-hidden group h-[280px] md:h-[340px]",
+                file && "bg-[#0CA69D]",
               )}
             >
-              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_white_1px,_transparent_1px)] bg-[length:24px_24px]"></div>
-              <UploadCloud className="w-16 h-16 text-white mb-6 drop-shadow-md group-hover:-translate-y-2 transition-transform duration-300" />
-              <h3 className="text-2xl font-bold text-white mb-2 tracking-tight text-center relative z-10">
-                {file ? file.name : "Upload CSV/Excel Spreadsheet Here"}
-              </h3>
-              <p className="text-[#a4e1df] font-medium text-center relative z-10 text-[16px]">
-                {file
-                  ? "File Loaded Successfully. Click to Change."
-                  : "Drag & Drop or Click to Browse"}
+              {/* Inner dashed border to mimic the image */}
+              <div className="absolute inset-1.5 border border-dashed border-white/60 pointer-events-none rounded-lg" />
+
+              {/* Document Icon Graphic like Smallpdf */}
+              <div className="mb-6 relative z-10 flex text-white/90">
+                <FileSpreadsheet className="w-16 h-16" strokeWidth={1} />
+              </div>
+
+              {/* White Choose Files Button */}
+              <div className="bg-white text-[#1a1a1a] px-6 py-2.5 sm:px-8 sm:py-3 rounded font-bold text-sm sm:text-base shadow-sm relative z-10 group-hover:scale-105 transition-transform flex items-center gap-2">
+                <UploadCloud className="w-5 h-5" />
+                {file ? "Change File" : "CHOOSE FILES"}
+                <div className="border-l border-slate-200 ml-2 pl-2">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-white font-medium text-center relative z-10 text-[16px] mt-4 tracking-wide">
+                {file ? `Loading: ${file.name}` : "or drop files here"}
               </p>
             </div>
           </div>
 
-          <div className="w-full md:w-1/3 flex flex-col justify-center gap-4">
-            <div className="bg-slate-50 border-2 border-slate-100 rounded-2xl p-6 flex flex-col justify-center min-h-[140px] text-center shadow-sm">
+          <div className="w-full flex justify-center mt-4">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col justify-center min-w-[200px] text-center shadow-sm">
               <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">
                 Locations Found
               </h4>
@@ -1615,111 +1657,6 @@ export default function GeoMapAnimator() {
                 and smoothly flying to each destination.
               </p>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mt-12">
-        <h2 className="text-2xl font-bold text-slate-900 mb-8">
-          Frequently Asked Questions (FAQs)
-        </h2>
-        <div className="space-y-8">
-          <div>
-            <h3 className="font-bold text-lg text-slate-900 mb-2">
-              1. How can I show my Excel data on Google Maps?
-            </h3>
-            <p className="text-slate-600 leading-relaxed">
-              It is very easy. Just upload your Excel file to our website. If
-              your file has latitude and longitude, our tool will quickly show
-              all the locations on a map.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-bold text-lg text-slate-900 mb-2">
-              2. Do latitude and longitude need to be in the same column?
-            </h3>
-            <p className="text-slate-600 leading-relaxed">
-              No! You can have latitude and longitude in one single column, or
-              in two different columns. Our tool understands both and works
-              perfectly.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-bold text-lg text-slate-900 mb-2">
-              3. Can I filter locations by date and time?
-            </h3>
-            <p className="text-slate-600 leading-relaxed">
-              Yes. If your Excel file has dates and times, you can select a
-              specific time. The map will only show the locations for the time
-              you choose.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-bold text-lg text-slate-900 mb-2">
-              4. What does the "Play Button" do?
-            </h3>
-            <p className="text-slate-600 leading-relaxed">
-              When you click the "Play" button, a moving arrow appears on the
-              map. It shows you the exact path step-by-step, following the time
-              and locations from your file.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-bold text-lg text-slate-900 mb-2">
-              5. Who can use this tool?
-            </h3>
-            <p className="text-slate-600 leading-relaxed">
-              Anyone who wants to track movement! It is very useful for tracking
-              deliveries, travel routes, or investigating location patterns like
-              tower data.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-bold text-lg text-slate-900 mb-2">
-              6. Is my data safe on this website?
-            </h3>
-            <p className="text-slate-600 leading-relaxed">
-              Yes, your data is 100% safe. Your Excel file is only used to show
-              the map on your screen. We never save or share your data with
-              anyone.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-bold text-lg text-slate-900 mb-2">
-              7. Can it handle very large Excel files?
-            </h3>
-            <p className="text-slate-600 leading-relaxed">
-              Yes! Even if your file has thousands of location points, our tool
-              will show them on the map quickly without slowing down.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-bold text-lg text-slate-900 mb-2">
-              8. Do I need to download any app or software?
-            </h3>
-            <p className="text-slate-600 leading-relaxed">
-              No. You do not need to download anything. Just open our website on
-              your browser, upload your file, and start using it.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-bold text-lg text-slate-900 mb-2">
-              9. Can I zoom in or see the street view?
-            </h3>
-            <p className="text-slate-600 leading-relaxed">
-              Yes. Since our tool uses Google Maps, you can zoom in, zoom out,
-              change to satellite view, or look at the street view just like a
-              normal map.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-bold text-lg text-slate-900 mb-2">
-              10. Does this work on mobile phones?
-            </h3>
-            <p className="text-slate-600 leading-relaxed">
-              Yes, it works perfectly on both mobile phones and computers. You
-              can use all the features easily from your smartphone.
-            </p>
           </div>
         </div>
       </div>

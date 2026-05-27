@@ -11,6 +11,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const location = useLocation();
   const currentToolId = location.pathname.split("/")[1] || "";
   const currentToolInfo = BLOG_ARTICLES.find(
@@ -38,11 +39,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
               {/* Nav Links */}
               <nav className="hidden lg:flex space-x-6">
-                <div className="group relative">
+                <div
+                  className="relative"
+                  onMouseEnter={() => setIsMenuOpen(true)}
+                  onMouseLeave={() => setIsMenuOpen(false)}
+                >
                   <button className="text-[15px] font-semibold text-[#1a1a1a] hover:text-[#006fff] flex items-center gap-1 transition-colors h-[72px]">
                     All Tools
                     <svg
-                      className="w-4 h-4 ml-1 opacity-70 group-hover:rotate-180 transition-transform"
+                      className={cn(
+                        "w-4 h-4 ml-1 opacity-70 transition-transform",
+                        isMenuOpen ? "rotate-180" : "",
+                      )}
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -56,11 +64,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     </svg>
                   </button>
                   {/* Dropdown styling similar to smallpdf */}
-                  <div className="absolute top-[72px] left-0 w-[800px] max-h-[80vh] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 grid grid-cols-3 gap-2">
+                  <div
+                    className={cn(
+                      "absolute top-[72px] left-0 w-[800px] max-h-[80vh] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-xl p-4 transition-all z-50 grid grid-cols-3 gap-2",
+                      isMenuOpen
+                        ? "opacity-100 visible"
+                        : "opacity-0 invisible",
+                    )}
+                  >
                     {TOOLS.map((t) => (
                       <Link
                         key={t.id}
                         to={t.path}
+                        onClick={() => setIsMenuOpen(false)}
                         className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg"
                       >
                         <t.icon
@@ -284,30 +300,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </div>
                 </div>
 
-                {/* FAQs Section */}
-                <div className="w-full max-w-[800px] mx-auto border-t border-gray-200 pt-16">
-                  <h2 className="text-[32px] font-bold text-[#1a1a1a] mb-10 text-center tracking-tight">
-                    FAQs
-                  </h2>
-                  <div className="space-y-6">
-                    {currentToolInfo.faq.map((f, idx) => (
-                      <div
-                        key={idx}
-                        className="border border-gray-200 rounded-xl p-6 bg-[#fafafa]"
-                      >
-                        <h4 className="text-[18px] font-bold text-[#1a1a1a] mb-2">
-                          {f.q}
-                        </h4>
-                        <p className="text-[16px] text-[#4a4a4a] leading-relaxed">
-                          {f.a}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Explore Our Other Tools Section */}
-                <div className="w-full max-w-[1200px] mx-auto pt-24 mt-24 border-t border-gray-200">
+                <div className="w-full max-w-[1200px] mx-auto border-t border-gray-200 pt-16">
                   <h2 className="text-[32px] font-bold text-[#1a1a1a] mb-10 text-center tracking-tight">
                     Explore Our Other Tools
                   </h2>
@@ -331,6 +325,28 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         );
                       },
                     )}
+                  </div>
+                </div>
+
+                {/* FAQs Section */}
+                <div className="w-full max-w-[800px] mx-auto pt-24 mt-24 border-t border-gray-200">
+                  <h2 className="text-[32px] font-bold text-[#1a1a1a] mb-10 text-center tracking-tight">
+                    FAQs
+                  </h2>
+                  <div className="space-y-6">
+                    {currentToolInfo.faq.map((f, idx) => (
+                      <div
+                        key={idx}
+                        className="border border-gray-200 rounded-xl p-6 bg-[#fafafa]"
+                      >
+                        <h4 className="text-[18px] font-bold text-[#1a1a1a] mb-2">
+                          {f.q}
+                        </h4>
+                        <p className="text-[16px] text-[#4a4a4a] leading-relaxed">
+                          {f.a}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
