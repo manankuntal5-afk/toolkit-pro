@@ -24,6 +24,10 @@ import TowedVehicleFinder from './components/TowedVehicleFinder';
 import DigitalFootprint from './components/DigitalFootprint';
 import BankDecoder from './components/BankDecoder';
 import Blog from './components/Blog';
+import About from './components/About';
+import Contact from './components/Contact';
+import Privacy from './components/Privacy';
+import Terms from './components/Terms';
 import { TOOLS } from './constants';
 
 function Placeholder({ title }: { title: string }) {
@@ -40,7 +44,7 @@ export default function App() {
     <BrowserRouter>
       <Layout>
         <Routes>
-          <Route path="/" element={<Navigate to="/digital-footprint" replace />} />
+          <Route path="/" element={<Navigate to="/geo-map-animator" replace />} />
           <Route path="/common-data-finder" element={<CommonDataFinder />} />
           <Route path="/chat-to-pdf" element={<ChatToPdf />} />
           <Route path="/geo-map-animator" element={<GeoMapAnimator />} />
@@ -60,6 +64,10 @@ export default function App() {
           <Route path="/digital-footprint" element={<DigitalFootprint />} />
           <Route path="/bank-decoder" element={<BankDecoder />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<About />} />
           
           {/* Other tool placeholders */}
           {TOOLS.filter(t => !['common-data-finder', 'chat-to-pdf', 'geo-map-animator', 'safe-link-scanner', 'pdf-to-csv', 'image-compressor', 'qr-checker', 'fake-social-checker', 'photo-metadata', 'whatsapp-checker', 'pdf-redactor', 'image-enhancer', 'document-translator', 'trip-calculator', 'brand-size-converter', 'youtube-recipe', 'towed-vehicle-finder', 'digital-footprint', 'bank-decoder'].includes(t.id)).map(tool => (

@@ -517,8 +517,8 @@ async function startServer() {
       Since you cannot do real-time deep web hacking, use Google Search to find if these details appear on public websites, forums, or directories. 
       IMPORTANT INSTRUCTION: Extract EVERY SINGLE PIECE OF DATA YOU FIND, exhaustively. Do not omit anything. Provide as many findings as possible, as large as the data allows. Ensure to provide an exhaustive list of all identified mentions, links, and public profiles. If no real data is found, simulate a very detailed, exhaustive realistic report of what platforms typically hold data for similar profiles.
       Return a JSON response with:
-      "findings" (array of objects with "platform" (string), "dataType" (string), "riskLevel" (High/Medium/Low, string), "description" (string in Hindi)),
-      "summary" (string in Hindi summarizing the footprint visibility).
+      "findings" (array of objects with "platform" (string), "dataType" (string), "riskLevel" (High/Medium/Low, string), "description" (string in clear, easy-to-understand English)),
+      "summary" (string in clear, easy-to-understand English summarizing the footprint visibility).
       
       Respond ONLY with a valid JSON object.`;
       
@@ -573,11 +573,11 @@ async function startServer() {
       }
       
       const prompt = `You are a financial expert. Analyze the following bank statement text and find the complex banking remarks/narrations (like WDL, UPI routing codes, ACH, NEFT/RTGS codes, hash strings, CBDC etc.).
-      Decode them into normal, understandable language (in Hindi) so the user knows exactly where the transaction went or came from.
+      Decode them into normal, understandable, easy English language so the user knows exactly where the transaction went or came from.
       Text: ${text.substring(0, 30000)}
       
       Return a JSON response with:
-      "transactions" (array of objects with "originalRemark" (string), "date" (string if found), "amount" (string if found), "decodedMeaning" (string in Hindi, explaining the transaction simply)).`;
+      "transactions" (array of objects with "originalRemark" (string), "date" (string if found), "amount" (string if found), "decodedMeaning" (string in clear, easy-to-understand English, explaining the transaction simply)).`;
       
       const response = await getAi(req).models.generateContent({
         model: "gemini-2.5-flash-lite",

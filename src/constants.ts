@@ -2,6 +2,13 @@ import { FileSpreadsheet, MessageSquareText, Map, ShieldAlert, ImagePlus, QrCode
 
 export const TOOLS = [
   {
+    id: "geo-map-animator",
+    name: "Excel to 3D Map",
+    icon: Globe,
+    path: "/geo-map-animator",
+    description: "Animate lat/long locations from Excel bulk data."
+  },
+  {
     id: "digital-footprint",
     name: "Digital Footprint Scanner",
     icon: Fingerprint,
@@ -21,13 +28,6 @@ export const TOOLS = [
     icon: Smartphone,
     path: "/chat-to-pdf",
     description: "Convert Chat screenshots/TXT to PDF for court."
-  },
-  {
-    id: "geo-map-animator",
-    name: "Excel to 3D Map",
-    icon: Globe,
-    path: "/geo-map-animator",
-    description: "Animate lat/long locations from Excel bulk data."
   },
   {
     id: "safe-link-scanner",
