@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Home Page -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Geo Map Animator -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/geo-map-animator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Digital Footprint Checker -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/digital-footprint</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Common Data Finder -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/common-data-finder</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Social Media Chat to PDF -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/chat-to-pdf</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Safe Link Checker -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/safe-link-checker</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- QR Code Scanner -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/qr-scanner</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Fake Social Checker -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/fake-social-checker</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Image Resizer -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/image-resizer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- PDF Redactor & Hider -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/pdf-redactor</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- PDF to CSV & AI Chat -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/pdf-to-csv</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Photo Metadata -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/photo-metadata</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Bulk WhatsApp Checker -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/whatsapp-checker</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Document Translator -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/document-translator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Trip Calculator -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/trip-calculator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Brand Size Converter -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/brand-size-converter</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- YouTube Recipe Extractor -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/youtube-recipe</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Towed Vehicle Finder -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/towed-vehicle</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Bank Statement Decoder -->
+  <url>
+    <loc>https://toolkit-pro-fzsl.onrender.com/bank-statement-decoder</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>
