@@ -22,7 +22,7 @@ export default function DemoAnimationPdfToCsv() {
     // 6: Reset
     const timer = setInterval(() => {
       setStep((prev) => (prev + 1) % 7);
-    }, 1500);
+    }, 800);
     return () => clearInterval(timer);
   }, []);
 

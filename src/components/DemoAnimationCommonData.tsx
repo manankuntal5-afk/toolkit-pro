@@ -22,7 +22,7 @@ export default function DemoAnimationCommonData() {
     // 7: Reset
     const timer = setInterval(() => {
       setStep((prev) => (prev + 1) % 8);
-    }, 1500); // 1.5s per step
+    }, 800);
     return () => clearInterval(timer);
   }, []);
 

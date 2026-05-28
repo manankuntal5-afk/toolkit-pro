@@ -21,7 +21,7 @@ export default function DemoAnimationFakeSocial() {
     // 5: Reset
     const timer = setInterval(() => {
       setStep((prev) => (prev + 1) % 6);
-    }, 1500);
+    }, 800);
     return () => clearInterval(timer);
   }, []);
 

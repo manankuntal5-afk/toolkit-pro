@@ -40,13 +40,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isTool = !!currentToolInfo && !isBlogRoute;
 
   React.useEffect(() => {
+    let link: HTMLLinkElement = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+
     if (currentToolInfo) {
       document.title =
         (currentToolInfo as any).seoTitle ||
         currentToolInfo.title ||
         "ToolBox Pro";
+      link.href = currentToolInfo.image;
     } else {
       document.title = "ToolBox Pro";
+      link.href = "/favicon.ico";
     }
   }, [currentToolInfo]);
 

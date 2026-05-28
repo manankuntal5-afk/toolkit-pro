@@ -22,7 +22,7 @@ export default function DemoAnimationFootprint() {
     // 5: Reset
     const timer = setInterval(() => {
       setStep((prev) => (prev + 1) % 8);
-    }, 1200);
+    }, 800);
     return () => clearInterval(timer);
   }, []);
 

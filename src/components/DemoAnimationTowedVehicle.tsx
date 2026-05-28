@@ -20,7 +20,7 @@ export default function DemoAnimationTowedVehicle() {
     // 4: Reset
     const timer = setInterval(() => {
       setStep((prev) => (prev + 1) % 5);
-    }, 2000);
+    }, 800);
     return () => clearInterval(timer);
   }, []);
 

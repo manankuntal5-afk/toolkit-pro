@@ -1073,19 +1073,28 @@ export default function GeoMapAnimator() {
       <div className="bg-white rounded-3xl shadow-xl shadow-slate-200 border border-slate-100 p-6 md:p-8 mb-12 relative overflow-hidden">
         {/* Icons Above Upload Area */}
         <div className="flex justify-center items-center gap-8 mb-6">
-          <div className="flex flex-col items-center gap-2 text-slate-600 transition-transform hover:scale-105 hover:text-blue-600 cursor-pointer">
+          <div 
+            className="flex flex-col items-center gap-2 text-slate-600 transition-transform hover:scale-105 hover:text-blue-600 cursor-pointer"
+            onClick={() => document.getElementById("file-upload-input")?.click()}
+          >
             <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-sm border border-blue-100">
               <FileSpreadsheet className="w-7 h-7" />
             </div>
             <span className="font-semibold text-sm">CSV</span>
           </div>
-          <div className="flex flex-col items-center gap-2 text-slate-600 transition-transform hover:scale-105 hover:text-green-600 cursor-pointer">
+          <div 
+            className="flex flex-col items-center gap-2 text-slate-600 transition-transform hover:scale-105 hover:text-green-600 cursor-pointer"
+            onClick={() => document.getElementById("file-upload-input")?.click()}
+          >
             <div className="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center shadow-sm border border-green-100">
               <FileSpreadsheet className="w-7 h-7" />
             </div>
             <span className="font-semibold text-sm">Excel</span>
           </div>
-          <div className="flex flex-col items-center gap-2 text-slate-600 transition-transform hover:scale-105 hover:text-purple-600 cursor-pointer">
+          <div 
+            className="flex flex-col items-center gap-2 text-slate-600 transition-transform hover:scale-105 hover:text-purple-600 cursor-pointer"
+            onClick={() => document.getElementById("file-upload-input")?.click()}
+          >
             <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center shadow-sm border border-purple-100">
               <FileSpreadsheet className="w-7 h-7" />
             </div>
@@ -1096,6 +1105,7 @@ export default function GeoMapAnimator() {
         <div className="flex flex-col gap-6 mb-8 relative z-10 w-full max-w-4xl mx-auto">
           <div className="w-full relative group">
             <input
+              id="file-upload-input"
               type="file"
               onChange={handleFileUpload}
               accept=".csv, .xlsx, .xls"
