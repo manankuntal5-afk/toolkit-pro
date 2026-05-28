@@ -721,6 +721,35 @@ async function startServer() {
     }
   });
 
+  // Explicitly serve sitemap.xml and robots.txt to prevent SPA fallback interception
+  app.get("/sitemap.xml", (req, res) => {
+    const isProd = process.env.NODE_ENV === "production";
+    const filePath = isProd 
+      ? path.join(process.cwd(), "dist", "sitemap.xml")
+      : path.join(process.cwd(), "public", "sitemap.xml");
+      
+    if (fs.existsSync(filePath)) {
+      res.set("Content-Type", "application/xml");
+      res.sendFile(filePath);
+    } else {
+      res.status(404).end();
+    }
+  });
+
+  app.get("/robots.txt", (req, res) => {
+    const isProd = process.env.NODE_ENV === "production";
+    const filePath = isProd 
+      ? path.join(process.cwd(), "dist", "robots.txt")
+      : path.join(process.cwd(), "public", "robots.txt");
+      
+    if (fs.existsSync(filePath)) {
+      res.set("Content-Type", "text/plain");
+      res.sendFile(filePath);
+    } else {
+      res.status(404).end();
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
