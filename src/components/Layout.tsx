@@ -6,6 +6,25 @@ import { twMerge } from "tailwind-merge";
 import { BLOG_ARTICLES } from "../blogData";
 import { Wrench } from "lucide-react";
 
+import DemoAnimation from "./DemoAnimation";
+import DemoAnimationFootprint from "./DemoAnimationFootprint";
+import DemoAnimationCommonData from "./DemoAnimationCommonData";
+import DemoAnimationChatPdf from "./DemoAnimationChatPdf";
+import DemoAnimationSafeLink from "./DemoAnimationSafeLink";
+import DemoAnimationQRScanner from "./DemoAnimationQRScanner";
+import DemoAnimationFakeSocial from "./DemoAnimationFakeSocial";
+import DemoAnimationImageResizer from "./DemoAnimationImageResizer";
+import DemoAnimationPdfRedactor from "./DemoAnimationPdfRedactor";
+import DemoAnimationPdfToCsv from "./DemoAnimationPdfToCsv";
+import DemoAnimationPhotoMetadata from "./DemoAnimationPhotoMetadata";
+import DemoAnimationWhatsappChecker from "./DemoAnimationWhatsappChecker";
+import DemoAnimationDocumentTranslator from "./DemoAnimationDocumentTranslator";
+import DemoAnimationTripCalculator from "./DemoAnimationTripCalculator";
+import DemoAnimationBrandSizeConverter from "./DemoAnimationBrandSizeConverter";
+import DemoAnimationYoutubeRecipe from "./DemoAnimationYoutubeRecipe";
+import DemoAnimationTowedVehicle from "./DemoAnimationTowedVehicle";
+import DemoAnimationBankDecoder from "./DemoAnimationBankDecoder";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -19,6 +38,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   );
   const isBlogRoute = location.pathname === "/blog";
   const isTool = !!currentToolInfo && !isBlogRoute;
+
+  React.useEffect(() => {
+    if (currentToolInfo) {
+      document.title =
+        (currentToolInfo as any).seoTitle ||
+        currentToolInfo.title ||
+        "ToolBox Pro";
+    } else {
+      document.title = "ToolBox Pro";
+    }
+  }, [currentToolInfo]);
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans">
@@ -166,6 +196,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <h1 className="text-[36px] md:text-[44px] font-bold text-[#1a1a1a] mb-6 text-center tracking-tight leading-tight">
                   {currentToolInfo.title}
                 </h1>
+                {(currentToolInfo as any).subtitle && (
+                  <h2 className="text-[24px] md:text-[28px] font-bold text-[#1a1a1a] mb-6 text-center tracking-tight text-opacity-80">
+                    {(currentToolInfo as any).subtitle}
+                  </h2>
+                )}
                 <p className="text-[18px] md:text-[22px] text-[#4a4a4a] text-center mb-24 max-w-3xl mx-auto leading-relaxed">
                   {currentToolInfo.whatItIs}
                 </p>
@@ -242,11 +277,49 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     </ul>
                   </div>
                   <div className="w-full md:w-1/2 order-1 md:order-2 flex justify-center">
-                    <img
-                      src={currentToolInfo.image}
-                      alt={currentToolInfo.title}
-                      className="rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.08)] max-w-full h-auto object-cover border border-gray-100"
-                    />
+                    {currentToolInfo.id === "geo-map-animator" ? (
+                      <DemoAnimation />
+                    ) : currentToolInfo.id === "digital-footprint" ? (
+                      <DemoAnimationFootprint />
+                    ) : currentToolInfo.id === "common-data-finder" ? (
+                      <DemoAnimationCommonData />
+                    ) : currentToolInfo.id === "chat-to-pdf" ? (
+                      <DemoAnimationChatPdf />
+                    ) : currentToolInfo.id === "safe-link-scanner" ? (
+                      <DemoAnimationSafeLink />
+                    ) : currentToolInfo.id === "qr-checker" ? (
+                      <DemoAnimationQRScanner />
+                    ) : currentToolInfo.id === "fake-social-checker" ? (
+                      <DemoAnimationFakeSocial />
+                    ) : currentToolInfo.id === "image-compressor" ? (
+                      <DemoAnimationImageResizer />
+                    ) : currentToolInfo.id === "pdf-redactor" ? (
+                      <DemoAnimationPdfRedactor />
+                    ) : currentToolInfo.id === "pdf-to-csv" ? (
+                      <DemoAnimationPdfToCsv />
+                    ) : currentToolInfo.id === "photo-metadata" ? (
+                      <DemoAnimationPhotoMetadata />
+                    ) : currentToolInfo.id === "whatsapp-checker" ? (
+                      <DemoAnimationWhatsappChecker />
+                    ) : currentToolInfo.id === "document-translator" ? (
+                      <DemoAnimationDocumentTranslator />
+                    ) : currentToolInfo.id === "trip-calculator" ? (
+                      <DemoAnimationTripCalculator />
+                    ) : currentToolInfo.id === "brand-size-converter" ? (
+                      <DemoAnimationBrandSizeConverter />
+                    ) : currentToolInfo.id === "youtube-recipe" ? (
+                      <DemoAnimationYoutubeRecipe />
+                    ) : currentToolInfo.id === "towed-vehicle" ? (
+                      <DemoAnimationTowedVehicle />
+                    ) : currentToolInfo.id === "bank-decoder" ? (
+                      <DemoAnimationBankDecoder />
+                    ) : (
+                      <img
+                        src={currentToolInfo.image}
+                        alt={currentToolInfo.title}
+                        className="rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.08)] w-full max-w-[500px] h-auto object-cover border border-gray-100"
+                      />
+                    )}
                   </div>
                 </div>
 
