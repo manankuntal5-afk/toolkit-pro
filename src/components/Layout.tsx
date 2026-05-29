@@ -40,6 +40,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isTool = !!currentToolInfo && !isBlogRoute;
 
   React.useEffect(() => {
+    let link: HTMLLinkElement = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+
     if (currentToolInfo) {
       document.title =
         (currentToolInfo as any).seoTitle ||
@@ -48,6 +55,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     } else {
       document.title = "ToolBox Pro";
     }
+    
+    // Always set favicon to our new SVG
+    link.href = "/favicon.svg";
   }, [currentToolInfo]);
 
   return (
