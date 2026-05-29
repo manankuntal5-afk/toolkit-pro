@@ -5,7 +5,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { BLOG_ARTICLES } from "../blogData";
 import { ARTICLES, Article } from "../articlesData";
-import { Wrench } from "lucide-react";
+import { Wrench, Search, X } from "lucide-react";
 
 import DemoAnimation from "./DemoAnimation";
 import DemoAnimationFootprint from "./DemoAnimationFootprint";
@@ -31,8 +31,41 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<"all" | "security" | "pdf" | null>(null);
   const [showAllArticles, setShowAllArticles] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const uploadToolIds = [
+    "geo-map-animator",
+    "common-data-finder",
+    "chat-to-pdf",
+    "qr-checker",
+    "image-compressor",
+    "pdf-to-csv",
+    "photo-metadata",
+    "pdf-redactor",
+    "document-translator"
+  ];
+
+  const pdfTools = TOOLS.filter(t => uploadToolIds.includes(t.id));
+  const securityTools = TOOLS.filter(t => !uploadToolIds.includes(t.id));
+
+  const filteredTools = searchQuery.trim() === "" 
+    ? [] 
+    : TOOLS.filter(t => 
+        t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        t.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+  const filteredArticles = searchQuery.trim() === "" 
+    ? [] 
+    : ARTICLES.filter(a => 
+        a.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        a.summary.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        a.content.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
   const location = useLocation();
   const currentToolId = location.pathname.split("/")[1] || "";
   const currentSlug = location.pathname.split("/")[2] || "";
@@ -49,27 +82,42 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const sliderArticles = currentArticleInfo ? toolArticles.filter(a => a.id !== currentArticleInfo.id) : [];
   const [sliderIndex, setSliderIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   const isBlogRoute = location.pathname === "/blog";
   const isTool = !!currentToolInfo && !isBlogRoute;
   const isArticleView = !!currentArticleInfo;
 
   React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  React.useEffect(() => {
     let timer: any;
     if (isArticleView && sliderArticles.length > 0) {
       timer = setInterval(() => {
-        setSliderIndex(prev => (prev + 1) % sliderArticles.length);
-      }, 3000);
+        setIsTransitioning(true);
+        setSliderIndex(prev => prev + 1);
+      }, 3500);
     }
     return () => clearInterval(timer);
   }, [isArticleView, sliderArticles.length, currentSlug]);
 
-  const displaySliderArticles = [];
-  if (sliderArticles.length > 0) {
-      for (let i = 0; i < 3; i++) {
-          displaySliderArticles.push(sliderArticles[(sliderIndex + i) % sliderArticles.length]);
-      }
-  }
+  React.useEffect(() => {
+    if (sliderIndex >= sliderArticles.length) {
+      const resetTimer = setTimeout(() => {
+        setIsTransitioning(false);
+        setSliderIndex(0);
+      }, 700);
+      return () => clearTimeout(resetTimer);
+    }
+  }, [sliderIndex, sliderArticles.length]);
 
   const articleHeadingRef = React.useRef<HTMLHeadingElement>(null);
 
@@ -128,17 +176,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
               {/* Nav Links */}
               <nav className="hidden lg:flex space-x-6">
+                {/* All Tools dropdown */}
                 <div
                   className="relative"
-                  onMouseEnter={() => setIsMenuOpen(true)}
-                  onMouseLeave={() => setIsMenuOpen(false)}
+                  onMouseEnter={() => setActiveDropdown("all")}
+                  onMouseLeave={() => setActiveDropdown(null)}
                 >
-                  <button className="text-[15px] font-semibold text-[#1a1a1a] hover:text-[#006fff] flex items-center gap-1 transition-colors h-[72px]">
+                  <button 
+                    onClick={() => setActiveDropdown(activeDropdown === "all" ? null : "all")}
+                    className="text-[15px] font-semibold text-[#1a1a1a] hover:text-[#006fff] flex items-center gap-1 transition-colors h-[72px]"
+                  >
                     All Tools
                     <svg
                       className={cn(
                         "w-4 h-4 ml-1 opacity-70 transition-transform",
-                        isMenuOpen ? "rotate-180" : "",
+                        activeDropdown === "all" ? "rotate-180" : "",
                       )}
                       fill="none"
                       viewBox="0 0 24 24"
@@ -152,25 +204,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       />
                     </svg>
                   </button>
-                  {/* Dropdown styling similar to smallpdf */}
                   <div
                     className={cn(
                       "absolute top-[72px] left-0 w-[800px] max-h-[80vh] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-xl p-4 transition-all z-50 grid grid-cols-3 gap-2",
-                      isMenuOpen
-                        ? "opacity-100 visible"
-                        : "opacity-0 invisible",
+                      activeDropdown === "all"
+                        ? "opacity-100 visible translate-y-0"
+                        : "opacity-0 invisible -translate-y-2 pointer-events-none",
                     )}
                   >
                     {TOOLS.map((t) => (
                       <Link
                         key={t.id}
                         to={t.path}
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={() => setActiveDropdown(null)}
                         className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg"
                       >
                         <t.icon
                           className={cn(
-                            "w-5 h-5",
+                            "w-5 h-5 flex-shrink-0",
                             location.pathname === t.path
                               ? "text-blue-600"
                               : "text-blue-500",
@@ -178,7 +229,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         />
                         <span
                           className={cn(
-                            "text-[14px] font-medium",
+                            "text-[14px] font-medium truncate",
                             location.pathname === t.path
                               ? "text-blue-600 font-bold"
                               : "text-slate-800",
@@ -190,33 +241,154 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     ))}
                   </div>
                 </div>
-                {/* A few quick links like smallpdf top nav */}
-                <Link
-                  to="/digital-footprint"
-                  className={cn(
-                    "text-[15px] font-semibold flex items-center transition-colors h-[72px]",
-                    location.pathname === "/digital-footprint"
-                      ? "text-blue-600 border-b-2 border-blue-600"
-                      : "text-[#1a1a1a] hover:text-[#006fff]",
-                  )}
+
+                {/* Security Tools dropdown */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setActiveDropdown("security")}
+                  onMouseLeave={() => setActiveDropdown(null)}
                 >
-                  Security Tools
-                </Link>
-                <Link
-                  to="/pdf-to-csv"
-                  className={cn(
-                    "text-[15px] font-semibold flex items-center transition-colors h-[72px]",
-                    location.pathname === "/pdf-to-csv"
-                      ? "text-blue-600 border-b-2 border-blue-600"
-                      : "text-[#1a1a1a] hover:text-[#006fff]",
-                  )}
+                  <button 
+                    onClick={() => setActiveDropdown(activeDropdown === "security" ? null : "security")}
+                    className="text-[15px] font-semibold text-[#1a1a1a] hover:text-[#006fff] flex items-center gap-1 transition-colors h-[72px]"
+                  >
+                    Security Tools
+                    <svg
+                      className={cn(
+                        "w-4 h-4 ml-1 opacity-70 transition-transform",
+                        activeDropdown === "security" ? "rotate-180" : "",
+                      )}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  <div
+                    className={cn(
+                      "absolute top-[72px] left-0 w-[800px] max-h-[80vh] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-xl p-4 transition-all z-50 grid grid-cols-3 gap-2",
+                      activeDropdown === "security"
+                        ? "opacity-100 visible translate-y-0"
+                        : "opacity-0 invisible -translate-y-2 pointer-events-none",
+                    )}
+                  >
+                    {securityTools.map((t) => (
+                      <Link
+                        key={t.id}
+                        to={t.path}
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg"
+                      >
+                        <t.icon
+                          className={cn(
+                            "w-5 h-5 flex-shrink-0",
+                            location.pathname === t.path
+                              ? "text-blue-600"
+                              : "text-blue-500",
+                          )}
+                        />
+                        <span
+                          className={cn(
+                            "text-[14px] font-medium truncate",
+                            location.pathname === t.path
+                              ? "text-blue-600 font-bold"
+                              : "text-slate-800",
+                          )}
+                        >
+                          {t.name}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* PDF Tools dropdown */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setActiveDropdown("pdf")}
+                  onMouseLeave={() => setActiveDropdown(null)}
                 >
-                  PDF Tools
-                </Link>
+                  <button 
+                    onClick={() => setActiveDropdown(activeDropdown === "pdf" ? null : "pdf")}
+                    className="text-[15px] font-semibold text-[#1a1a1a] hover:text-[#006fff] flex items-center gap-1 transition-colors h-[72px]"
+                  >
+                    PDF Tools
+                    <svg
+                      className={cn(
+                        "w-4 h-4 ml-1 opacity-70 transition-transform",
+                        activeDropdown === "pdf" ? "rotate-180" : "",
+                      )}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  <div
+                    className={cn(
+                      "absolute top-[72px] left-0 w-[800px] max-h-[80vh] overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-xl p-4 transition-all z-50 grid grid-cols-3 gap-2",
+                      activeDropdown === "pdf"
+                        ? "opacity-100 visible translate-y-0"
+                        : "opacity-0 invisible -translate-y-2 pointer-events-none",
+                    )}
+                  >
+                    {pdfTools.map((t) => (
+                      <Link
+                        key={t.id}
+                        to={t.path}
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg"
+                      >
+                        <t.icon
+                          className={cn(
+                            "w-5 h-5 flex-shrink-0",
+                            location.pathname === t.path
+                              ? "text-blue-600"
+                              : "text-blue-500",
+                          )}
+                        />
+                        <span
+                          className={cn(
+                            "text-[14px] font-medium truncate",
+                            location.pathname === t.path
+                              ? "text-blue-600 font-bold"
+                              : "text-slate-800",
+                          )}
+                        >
+                          {t.name}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               </nav>
             </div>
 
             <div className="flex items-center space-x-4">
+              {/* Search Icon Button */}
+              <button 
+                onClick={() => {
+                  setIsSearchOpen(true);
+                  setSearchQuery("");
+                }}
+                className="text-[#1a1a1a] hover:text-[#006fff] p-2.5 rounded-lg hover:bg-slate-100 transition-colors flex items-center justify-center cursor-pointer"
+                title="Search Tools & Articles"
+              >
+                <Search className="w-[18px] h-[18px]" />
+              </button>
+
               <Link
                 to="/blog"
                 className={cn(
@@ -238,6 +410,115 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
+
+      {/* Search Overlay/Modal */}
+      {isSearchOpen && (
+        <div className="fixed inset-0 bg-[#0f172a]/60 backdrop-blur-md z-[100] flex items-start justify-center pt-20 px-4 transition-all duration-300">
+          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[75vh]">
+            {/* Search Input Box */}
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
+              <Search className="w-6 h-6 text-slate-400 flex-shrink-0" />
+              <input
+                type="text"
+                placeholder="Search tools, guides, and articles (e.g., pdf, map, resizer)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+                className="flex-1 text-slate-800 text-lg outline-none font-medium placeholder-slate-400 bg-transparent"
+              />
+              <button
+                onClick={() => setIsSearchOpen(false)}
+                className="p-1.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                aria-label="Close search"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Results Box */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-6">
+              {searchQuery.trim() === "" ? (
+                <div className="text-center py-8 text-slate-500">
+                  <p className="font-medium text-slate-600 mb-1">Search Toolbox Pro</p>
+                  <p className="text-sm text-slate-400">Type above to search all 18 tools and helpful articles.</p>
+                </div>
+              ) : (
+                <>
+                  {filteredTools.length === 0 && filteredArticles.length === 0 ? (
+                    <div className="text-center py-8 text-slate-500">
+                      <p className="font-medium text-slate-600 mb-1">No results found for "{searchQuery}"</p>
+                      <p className="text-sm text-slate-400">Try searching for other terms like "PDF", "Excel", or "Map".</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Tools Match */}
+                      {filteredTools.length > 0 && (
+                        <div>
+                          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 pl-2">
+                            Tools ({filteredTools.length})
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {filteredTools.map((t) => {
+                              const tIcon = t.icon;
+                              const IconComponent = tIcon;
+                              return (
+                                <Link
+                                  key={t.id}
+                                  to={t.path}
+                                  onClick={() => setIsSearchOpen(false)}
+                                  className="flex items-center gap-3 p-3 hover:bg-blue-50/60 rounded-xl border border-transparent hover:border-blue-100 group transition-all"
+                                >
+                                  <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform flex-shrink-0">
+                                    <IconComponent className="w-5 h-5" />
+                                  </div>
+                                  <div className="text-left">
+                                    <div className="text-[15px] font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
+                                      {t.name}
+                                    </div>
+                                    <div className="text-xs text-slate-500 leading-tight line-clamp-1">
+                                      {t.description}
+                                    </div>
+                                  </div>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Articles Match */}
+                      {filteredArticles.length > 0 && (
+                        <div>
+                          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 pl-2">
+                            Guides & Articles ({filteredArticles.length})
+                          </h3>
+                          <div className="space-y-1">
+                            {filteredArticles.map((a) => (
+                              <Link
+                                key={a.id}
+                                to={`/${a.toolId}/${a.id}`}
+                                onClick={() => setIsSearchOpen(false)}
+                                className="flex flex-col items-start p-3 hover:bg-slate-50 rounded-xl border border-transparent hover:border-slate-100 transition-all text-left group"
+                              >
+                                <span className="text-[15px] font-bold text-slate-800 group-hover:text-blue-600 group-hover:underline leading-snug">
+                                  {a.title}
+                                </span>
+                                <span className="text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+                                  {a.summary}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       <main className="flex-1 w-full flex flex-col">
         {/* TOOL WORKSPACE AREA (Dropzone first, on colored background) */}
         {isTool && currentToolInfo && (
@@ -292,29 +573,42 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     </div>
 
                     {/* 5 Related Articles underneath */}
-                    {toolArticles.length > 1 && (
+                    {sliderArticles.length > 1 && (
                       <div className="mt-20 border-t border-gray-200 pt-16">
                         <h2 className="text-[28px] font-bold text-[#1a1a1a] mb-10 text-center tracking-tight">
                           Read More Related Articles
                         </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          {displaySliderArticles.map((article, idx) => (
-                            <div key={`${article.id}-${idx}`} className="bg-white border text-left border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col items-start gap-3">
-                              <img src={article.image} alt={article.title} className="w-full h-40 object-cover" />
-                              <div className="p-5 flex flex-col flex-1 w-full text-left">
-                                <h3 className="text-lg font-bold text-gray-900 mb-2 leading-tight line-clamp-2">
-                                  <Link to={`/${currentToolId}/${article.id}`} className="hover:text-blue-600">
-                                    {article.title}
-                                  </Link>
-                                </h3>
-                                <div className="w-full flex items-center justify-start mt-auto pt-3 border-t border-gray-100 text-sm">
-                                  <Link to={`/${currentToolId}/${article.id}`} className="text-blue-600 font-bold hover:underline inline-flex items-center">
-                                    Read full <span className="ml-1">&darr;</span>
-                                  </Link>
+                        <div className="relative w-full overflow-hidden py-4 px-1">
+                          <div 
+                            className={cn(
+                              "flex w-full",
+                              isTransitioning ? "transition-transform duration-700 ease-in-out" : "transition-none"
+                            )}
+                            style={{
+                              transform: `translateX(-${isMobile ? sliderIndex * 80 : sliderIndex * 47}%)`
+                            }}
+                          >
+                            {[...sliderArticles, ...sliderArticles].map((article, idx) => (
+                              <div 
+                                key={`${article.id}-${idx}`} 
+                                className="w-[75%] md:w-[43.5%] flex-shrink-0 mr-[5%] md:mr-[3.5%] bg-white border text-left border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col items-start gap-3"
+                              >
+                                <img src={article.image} alt={article.title} className="w-full h-40 object-cover" />
+                                <div className="p-5 flex flex-col flex-1 w-full text-left">
+                                  <h3 className="text-lg font-bold text-gray-900 mb-2 leading-tight line-clamp-2">
+                                    <Link to={`/${currentToolId}/${article.id}`} className="hover:text-blue-600">
+                                      {article.title}
+                                    </Link>
+                                  </h3>
+                                  <div className="w-full flex items-center justify-start mt-auto pt-3 border-t border-gray-100 text-sm">
+                                    <Link to={`/${currentToolId}/${article.id}`} className="text-blue-600 font-bold hover:underline inline-flex items-center">
+                                      Read full <span className="ml-1">&darr;</span>
+                                    </Link>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
                       </div>
                     )}
