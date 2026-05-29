@@ -1,9 +1,10 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { TOOLS } from "../constants";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { BLOG_ARTICLES } from "../blogData";
+import { ARTICLES, Article } from "../articlesData";
 import { Wrench } from "lucide-react";
 
 import DemoAnimation from "./DemoAnimation";
@@ -30,16 +31,64 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAllArticles, setShowAllArticles] = useState(false);
   const location = useLocation();
   const currentToolId = location.pathname.split("/")[1] || "";
+  const currentSlug = location.pathname.split("/")[2] || "";
   const currentToolInfo = BLOG_ARTICLES.find(
     (article) => article.toolUrl === `/${currentToolId}`,
   );
+  
+  const toolArticles = ARTICLES.filter(a => a.toolId === currentToolId);
+  const currentArticleInfo = toolArticles.find(a => a.id === currentSlug);
+
+  const currentIndex = currentArticleInfo ? toolArticles.findIndex(a => a.id === currentArticleInfo.id) : -1;
+  const nextArticle = currentIndex >= 0 ? toolArticles[(currentIndex + 1) % toolArticles.length] : null;
+  const prevArticle = currentIndex >= 0 ? toolArticles[(currentIndex - 1 + toolArticles.length) % toolArticles.length] : null;
+
+  const sliderArticles = currentArticleInfo ? toolArticles.filter(a => a.id !== currentArticleInfo.id) : [];
+  const [sliderIndex, setSliderIndex] = useState(0);
+
   const isBlogRoute = location.pathname === "/blog";
   const isTool = !!currentToolInfo && !isBlogRoute;
+  const isArticleView = !!currentArticleInfo;
 
   React.useEffect(() => {
+    let timer: any;
+    if (isArticleView && sliderArticles.length > 0) {
+      timer = setInterval(() => {
+        setSliderIndex(prev => (prev + 1) % sliderArticles.length);
+      }, 3000);
+    }
+    return () => clearInterval(timer);
+  }, [isArticleView, sliderArticles.length, currentSlug]);
+
+  const displaySliderArticles = [];
+  if (sliderArticles.length > 0) {
+      for (let i = 0; i < 3; i++) {
+          displaySliderArticles.push(sliderArticles[(sliderIndex + i) % sliderArticles.length]);
+      }
+  }
+
+  const articleHeadingRef = React.useRef<HTMLHeadingElement>(null);
+
+  React.useEffect(() => {
+    if (isArticleView && articleHeadingRef.current) {
+      // Need a small timeout to ensure layout is done
+      setTimeout(() => {
+        const yOffset = -100;
+        const element = articleHeadingRef.current;
+        if (element) {
+          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({top: y, behavior: 'smooth'});
+        }
+      }, 100);
+    }
+  }, [currentSlug, isArticleView]);
+
+  React.useEffect(() => {
+    setShowAllArticles(false);
     let link: HTMLLinkElement = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
     if (!link) {
       link = document.createElement('link');
@@ -203,17 +252,87 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {/* DETAILED CONTENT SECTION */}
             <div className="bg-white py-20 pb-10">
               <div className="max-w-[1000px] mx-auto px-6">
-                <h1 className="text-[36px] md:text-[44px] font-bold text-[#1a1a1a] mb-6 text-center tracking-tight leading-tight">
-                  {currentToolInfo.title}
-                </h1>
-                {(currentToolInfo as any).subtitle && (
-                  <h2 className="text-[24px] md:text-[28px] font-bold text-[#1a1a1a] mb-6 text-center tracking-tight text-opacity-80">
-                    {(currentToolInfo as any).subtitle}
-                  </h2>
-                )}
-                <p className="text-[18px] md:text-[22px] text-[#4a4a4a] text-center mb-24 max-w-3xl mx-auto leading-relaxed">
-                  {currentToolInfo.whatItIs}
-                </p>
+                
+                {isArticleView ? (
+                  <div className="max-w-4xl mx-auto text-left">
+                    <div className="flex justify-between items-center mb-6">
+                      {prevArticle && (
+                        <Link to={`/${currentToolId}/${prevArticle.id}`} className="text-blue-600 hover:underline font-semibold inline-flex items-center">
+                          &larr; Back
+                        </Link>
+                      )}
+                      {nextArticle && (
+                        <Link to={`/${currentToolId}/${nextArticle.id}`} className="text-blue-600 hover:underline font-semibold inline-flex items-center ml-auto">
+                          Next &rarr;
+                        </Link>
+                      )}
+                    </div>
+                    <h1 ref={articleHeadingRef} className="text-[36px] md:text-[44px] font-bold text-[#1a1a1a] mb-8 tracking-tight leading-tight mt-4 scroll-mt-6">
+                      {currentArticleInfo.title}
+                    </h1>
+                    <img src={currentArticleInfo.image} alt={currentArticleInfo.title} className="w-full h-auto rounded-2xl shadow-lg border border-gray-200 mb-10 object-cover max-h-[400px]" />
+                    <div className="text-lg text-gray-700 leading-relaxed">
+                      {currentArticleInfo.content.split('\n').map((para, i) => {
+                        if (para.startsWith('## ')) return <h2 key={i} className="text-3xl font-bold text-gray-900 mt-10 mb-5">{para.replace('## ', '')}</h2>;
+                        if (para.startsWith('### ')) return <h3 key={i} className="text-2xl font-bold text-gray-900 mt-8 mb-4">{para.replace('### ', '')}</h3>;
+                        if (para.match(/^\d+\./)) return <li key={i} className="ml-6 mb-3 list-decimal" dangerouslySetInnerHTML={{__html: para.replace(/^\d+\.\s*/, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}} />;
+                        if (para.trim()) return <p key={i} className="mb-5" dangerouslySetInnerHTML={{__html: para.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}} />;
+                        return null;
+                      })}
+                    </div>
+                    
+                    <div className="mt-16 text-center border-t border-gray-200 pt-10">
+                      <Link 
+                        to={`/${currentToolId}`} 
+                        onClick={() => window.scrollTo(0, 0)}
+                        className="inline-block bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-black text-2xl py-6 px-16 rounded-full shadow-[0_10px_25px_-5px_rgba(16,185,129,0.4)] hover:shadow-[0_20px_35px_-5px_rgba(16,185,129,0.5)] transform hover:-translate-y-1 transition-all duration-300 tracking-wide"
+                      >
+                        Use Tool
+                      </Link>
+                    </div>
+
+                    {/* 5 Related Articles underneath */}
+                    {toolArticles.length > 1 && (
+                      <div className="mt-20 border-t border-gray-200 pt-16">
+                        <h2 className="text-[28px] font-bold text-[#1a1a1a] mb-10 text-center tracking-tight">
+                          Read More Related Articles
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          {displaySliderArticles.map((article, idx) => (
+                            <div key={`${article.id}-${idx}`} className="bg-white border text-left border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col items-start gap-3">
+                              <img src={article.image} alt={article.title} className="w-full h-40 object-cover" />
+                              <div className="p-5 flex flex-col flex-1 w-full text-left">
+                                <h3 className="text-lg font-bold text-gray-900 mb-2 leading-tight line-clamp-2">
+                                  <Link to={`/${currentToolId}/${article.id}`} className="hover:text-blue-600">
+                                    {article.title}
+                                  </Link>
+                                </h3>
+                                <div className="w-full flex items-center justify-start mt-auto pt-3 border-t border-gray-100 text-sm">
+                                  <Link to={`/${currentToolId}/${article.id}`} className="text-blue-600 font-bold hover:underline inline-flex items-center">
+                                    Read full <span className="ml-1">&darr;</span>
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                  </div>
+                ) : (
+                  <>
+                    <h1 className="text-[36px] md:text-[44px] font-bold text-[#1a1a1a] mb-6 text-center tracking-tight leading-tight">
+                      {currentToolInfo.title}
+                    </h1>
+                    {(currentToolInfo as any).subtitle && (
+                      <h2 className="text-[24px] md:text-[28px] font-bold text-[#1a1a1a] mb-6 text-center tracking-tight text-opacity-80">
+                        {(currentToolInfo as any).subtitle}
+                      </h2>
+                    )}
+                    <p className="text-[18px] md:text-[22px] text-[#4a4a4a] text-center mb-24 max-w-3xl mx-auto leading-relaxed">
+                      {currentToolInfo.whatItIs}
+                    </p>
 
                 {/* Section 1: How it works with alternating layout */}
                 <div className="flex flex-col md:flex-row items-center gap-16 mb-24">
@@ -383,6 +502,54 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </div>
                 </div>
 
+                {/* Articles Section for the Tool */}
+                {toolArticles.length > 0 && (
+                  <div className="w-full max-w-[1200px] mx-auto border-t border-gray-200 pt-16">
+                    <h2 className="text-[32px] font-bold text-[#1a1a1a] mb-10 text-center tracking-tight">
+                      Guides & Articles
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                      {toolArticles.slice(0, showAllArticles ? toolArticles.length : 3).map((article) => (
+                        <div key={article.id} className="bg-white border text-left border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col items-start gap-4">
+                          <img src={article.image} alt={article.title} className="w-full h-48 object-cover" />
+                          <div className="p-6 flex flex-col flex-1 w-full text-left">
+                            <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight">
+                              <Link to={`/${currentToolId}/${article.id}`} className="hover:text-blue-600">
+                                {article.title}
+                              </Link>
+                            </h3>
+                            <p className="text-gray-600 mb-6 flex-1 line-clamp-3 w-full">{article.summary}</p>
+                            <div className="w-full flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                              <Link to={`/${currentToolId}/${article.id}`} className="text-blue-600 font-bold hover:underline inline-flex items-center">
+                                Read full article <span className="ml-1">&darr;</span>
+                              </Link>
+                              <Link 
+                                to={`/${currentToolId}`} 
+                                onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
+                                className="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
+                              >
+                                Open Tool
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {!showAllArticles && toolArticles.length > 3 && (
+                      <div className="text-center mb-10">
+                        <button 
+                          onClick={() => setShowAllArticles(true)}
+                          className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-lg transition-colors border border-gray-300"
+                        >
+                          Show more articles
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+                </>
+                )}
+
                 {/* Explore Our Other Tools Section */}
                 <div className="w-full max-w-[1200px] mx-auto border-t border-gray-200 pt-16">
                   <h2 className="text-[32px] font-bold text-[#1a1a1a] mb-10 text-center tracking-tight">
@@ -412,6 +579,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </div>
 
                 {/* FAQs Section */}
+                {!isArticleView && (
                 <div className="w-full max-w-[800px] mx-auto pt-24 mt-24 border-t border-gray-200">
                   <h2 className="text-[32px] font-bold text-[#1a1a1a] mb-10 text-center tracking-tight">
                     FAQs
@@ -432,6 +600,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     ))}
                   </div>
                 </div>
+                )}
               </div>
             </div>
           </>
