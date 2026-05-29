@@ -1,5 +1,6 @@
 import React from "react";
 import { Shield, Zap, Lock, Globe } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function About() {
   return (
@@ -73,9 +74,9 @@ export default function About() {
           Join thousands of users who trust ToolBox Pro for their daily PDF,
           Image, and Data automation needs.
         </p>
-        <button className="bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-colors shadow-sm">
+        <Link to="/" className="inline-block bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-colors shadow-sm">
           Explore All Tools
-        </button>
+        </Link>
       </div>
     </div>
   );
