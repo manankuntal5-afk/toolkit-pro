@@ -732,7 +732,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       <DemoAnimationBrandSizeConverter />
                     ) : currentToolInfo.id === "youtube-recipe" ? (
                       <DemoAnimationYoutubeRecipe />
-                    ) : currentToolInfo.id === "towed-vehicle" ? (
+                    ) : currentToolInfo.id === "towed-vehicle-finder" ? (
                       <DemoAnimationTowedVehicle />
                     ) : currentToolInfo.id === "bank-decoder" ? (
                       <DemoAnimationBankDecoder />
@@ -857,6 +857,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                           <Link
                             key={tool.id}
                             to={tool.path}
+                            onClick={() => window.scrollTo(0, 0)}
                             className="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:border-[#006fff] hover:shadow-lg transition-all text-center group cursor-pointer"
                           >
                             <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-blue-600 mb-4 group-hover:scale-110 transition-transform">
