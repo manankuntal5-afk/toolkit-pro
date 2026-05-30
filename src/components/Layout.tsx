@@ -104,7 +104,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       timer = setInterval(() => {
         setIsTransitioning(true);
         setSliderIndex(prev => prev + 1);
-      }, 3500);
+      }, 2000);
     }
     return () => clearInterval(timer);
   }, [isArticleView, sliderArticles.length, currentSlug]);
@@ -114,7 +114,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       const resetTimer = setTimeout(() => {
         setIsTransitioning(false);
         setSliderIndex(0);
-      }, 700);
+      }, 500);
       return () => clearTimeout(resetTimer);
     }
   }, [sliderIndex, sliderArticles.length]);
@@ -582,7 +582,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                           <div 
                             className={cn(
                               "flex w-full",
-                              isTransitioning ? "transition-transform duration-700 ease-in-out" : "transition-none"
+                              isTransitioning ? "transition-transform duration-500 ease-in-out" : "transition-none"
                             )}
                             style={{
                               transform: `translateX(-${isMobile ? sliderIndex * 80 : sliderIndex * 47}%)`
@@ -819,7 +819,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                               </Link>
                               <Link 
                                 to={`/${currentToolId}`} 
-                                onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
+                                onClick={() => window.scrollTo(0, 0)}
                                 className="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
                               >
                                 Open Tool
@@ -936,6 +936,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <li>
                     <Link
                       to="/about"
+                      onClick={() => window.scrollTo(0, 0)}
                       className="text-slate-500 hover:text-blue-600 font-medium transition-colors text-[15px]"
                     >
                       About Us
@@ -944,6 +945,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <li>
                     <Link
                       to="/contact"
+                      onClick={() => window.scrollTo(0, 0)}
                       className="text-slate-500 hover:text-blue-600 font-medium transition-colors text-[15px]"
                     >
                       Contact Us
@@ -959,6 +961,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <li>
                     <Link
                       to="/privacy"
+                      onClick={() => window.scrollTo(0, 0)}
                       className="text-slate-500 hover:text-blue-600 font-medium transition-colors text-[15px]"
                     >
                       Privacy Policy
@@ -967,6 +970,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <li>
                     <Link
                       to="/terms"
+                      onClick={() => window.scrollTo(0, 0)}
                       className="text-slate-500 hover:text-blue-600 font-medium transition-colors text-[15px]"
                     >
                       Terms & Conditions

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { BLOG_ARTICLES } from "../blogData";
+import { ARTICLES } from "../articlesData";
 
 export default function Blog() {
   return (
@@ -16,7 +17,10 @@ export default function Blog() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {BLOG_ARTICLES.map((article) => (
+        {BLOG_ARTICLES.map((article) => {
+          const toolId = article.toolUrl.replace('/', '');
+          const firstArticle = ARTICLES.find(a => a.toolId === toolId);
+          return (
           <article
             key={article.id}
             className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300"
@@ -39,17 +43,27 @@ export default function Blog() {
                 {article.whatItIs}
               </p>
 
-              <div className="mt-auto">
+              <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                {firstArticle && (
+                  <Link 
+                    to={`/${toolId}/${firstArticle.id}`} 
+                    className="text-blue-600 font-bold hover:underline inline-flex items-center"
+                  >
+                    Read full article <span className="ml-1">&darr;</span>
+                  </Link>
+                )}
                 <Link
                   to={article.toolUrl}
-                  className="w-full flex items-center justify-center bg-[#006fff] hover:bg-[#005cde] text-white px-6 py-3 rounded-xl font-bold transition-colors"
+                  onClick={() => window.scrollTo(0, 0)}
+                  className="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ml-auto"
                 >
                   Open Tool
                 </Link>
               </div>
             </div>
           </article>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
