@@ -207,104 +207,100 @@ export default function PdfToCsv() {
     }
   };
 
-  if (!file) {
-    return (
-      <div className="w-full flex items-center justify-center p-4">
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className="bg-[#2563eb] rounded-xl w-full max-w-[900px] h-[340px] relative flex flex-col items-center justify-center cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:bg-[#1d4ed8] transition-all duration-300 overflow-hidden group"
-        >
-          {/* Dashed white inner border like smallpdf */}
-          <div className="absolute inset-2 border-2 border-dashed border-white/40 pointer-events-none rounded-lg"></div>
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            accept=".pdf"
-            className="hidden"
-          />
-
-          {/* Custom SVG Icon for PDF in white */}
-          <div className="mb-8 mt-2 transform group-hover:scale-105 transition-transform duration-300">
-            <svg
-              width="84"
-              height="84"
-              viewBox="0 0 84 84"
-              fill="none"
-              stroke="white"
-              strokeWidth="1.5"
-            >
-              <path d="M22 18v52h44V34L46 18H22z" strokeLinejoin="round" />
-              <path d="M46 18v16h16" strokeLinejoin="round" />
-              <rect
-                x="34"
-                y="44"
-                width="20"
-                height="12"
-                rx="2"
-                fill="white"
-                stroke="none"
-              />
-              <text
-                x="44"
-                y="52"
-                textAnchor="middle"
-                fill="#2563eb"
-                stroke="none"
-                fontSize="10"
-                fontWeight="bold"
-              >
-                PDF
-              </text>
-            </svg>
-          </div>
-
-          <div className="flex items-center shadow-lg rounded bg-white hover:bg-gray-50 h-[56px] text-[#1a1a1a] z-10 font-bold text-[18px] transform focus:scale-95 transition-transform">
-            <div className="flex items-center px-6 h-full cursor-pointer">
-              <svg
-                className="w-5 h-5 mr-3"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              CHOOSE FILES
-            </div>
-            <div className="border-l border-gray-200 h-full flex items-center justify-center px-4 hover:bg-gray-100 cursor-pointer rounded-r">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
-          </div>
-          <p className="text-white text-[16px] mt-6 z-10 font-medium">
-            or drop files here
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full flex flex-col gap-8">
-      {/* Result UI Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {!file ? (
+        <div className="w-full flex items-center justify-center p-4">
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="bg-[#2563eb] rounded-xl w-full max-w-[900px] h-[340px] relative flex flex-col items-center justify-center cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:bg-[#1d4ed8] transition-all duration-300 overflow-hidden group"
+          >
+            {/* Dashed white inner border like smallpdf */}
+            <div className="absolute inset-2 border-2 border-dashed border-white/40 pointer-events-none rounded-lg"></div>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept=".pdf"
+              className="hidden"
+            />
+
+            {/* Custom SVG Icon for PDF in white */}
+            <div className="mb-8 mt-2 transform group-hover:scale-105 transition-transform duration-300">
+              <svg
+                width="84"
+                height="84"
+                viewBox="0 0 84 84"
+                fill="none"
+                stroke="white"
+                strokeWidth="1.5"
+              >
+                <path d="M22 18v52h44V34L46 18H22z" strokeLinejoin="round" />
+                <path d="M46 18v16h16" strokeLinejoin="round" />
+                <rect
+                  x="34"
+                  y="44"
+                  width="20"
+                  height="12"
+                  rx="2"
+                  fill="white"
+                  stroke="none"
+                />
+                <text
+                  x="44"
+                  y="52"
+                  textAnchor="middle"
+                  fill="#2563eb"
+                  stroke="none"
+                  fontSize="10"
+                  fontWeight="bold"
+                >
+                  PDF
+                </text>
+              </svg>
+            </div>
+
+            <div className="flex items-center shadow-lg rounded bg-white hover:bg-gray-50 h-[56px] text-[#1a1a1a] z-10 font-bold text-[18px] transform focus:scale-95 transition-transform">
+              <div className="flex items-center px-6 h-full cursor-pointer">
+                <svg
+                  className="w-5 h-5 mr-3"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                CHOOSE FILES
+              </div>
+              <div className="border-l border-gray-200 h-full flex items-center justify-center px-4 hover:bg-gray-100 cursor-pointer rounded-r">
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p className="text-white text-[16px] mt-6 z-10 font-medium">
+              or drop files here
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.06)] p-6">
           <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-4">
             <div className="flex items-center gap-3">
@@ -507,6 +503,46 @@ export default function PdfToCsv() {
               Send
             </button>
           </form>
+        </div>
+      </div>
+      )}
+
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <h2 className="text-xl font-bold text-slate-900 mb-6">How to use it</h2>
+        <div className="space-y-6">
+          <div className="flex gap-4">
+            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 font-bold">
+              1
+            </div>
+            <div>
+              <h4 className="font-semibold text-slate-900">Upload PDF</h4>
+              <p className="text-slate-600 text-sm mt-1">
+                Drag and drop your PDF file into the upload area or click to select a file from your device.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 font-bold">
+              2
+            </div>
+            <div>
+              <h4 className="font-semibold text-slate-900">Extract Tables</h4>
+              <p className="text-slate-600 text-sm mt-1">
+                Wait for the tool to automatically scan and extract tabular data. You can then download it as CSV or Excel.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 font-bold">
+              3
+            </div>
+            <div>
+              <h4 className="font-semibold text-slate-900">Chat with PDF</h4>
+              <p className="text-slate-600 text-sm mt-1">
+                Use the AI chat interface to ask specific questions about the document or request summaries.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

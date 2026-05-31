@@ -122,6 +122,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const articleHeadingRef = React.useRef<HTMLHeadingElement>(null);
 
   React.useEffect(() => {
+    if (!isArticleView) {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname, isArticleView]);
+
+  React.useEffect(() => {
     if (isArticleView && articleHeadingRef.current) {
       // Need a small timeout to ensure layout is done
       setTimeout(() => {
@@ -216,7 +222,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       <Link
                         key={t.id}
                         to={t.path}
-                        onClick={() => setActiveDropdown(null)}
+                        onClick={() => {
+                          setActiveDropdown(null);
+                          window.scrollTo(0, 0);
+                        }}
                         className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg"
                       >
                         <t.icon
@@ -282,7 +291,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       <Link
                         key={t.id}
                         to={t.path}
-                        onClick={() => setActiveDropdown(null)}
+                        onClick={() => {
+                          setActiveDropdown(null);
+                          window.scrollTo(0, 0);
+                        }}
                         className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg"
                       >
                         <t.icon
@@ -348,7 +360,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       <Link
                         key={t.id}
                         to={t.path}
-                        onClick={() => setActiveDropdown(null)}
+                        onClick={() => {
+                          setActiveDropdown(null);
+                          window.scrollTo(0, 0);
+                        }}
                         className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg"
                       >
                         <t.icon
@@ -465,7 +480,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 <Link
                                   key={t.id}
                                   to={t.path}
-                                  onClick={() => setIsSearchOpen(false)}
+                                  onClick={() => {
+                                    setIsSearchOpen(false);
+                                    window.scrollTo(0, 0);
+                                  }}
                                   className="flex items-center gap-3 p-3 hover:bg-blue-50/60 rounded-xl border border-transparent hover:border-blue-100 group transition-all"
                                 >
                                   <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform flex-shrink-0">

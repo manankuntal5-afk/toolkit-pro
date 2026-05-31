@@ -1060,16 +1060,6 @@ export default function GeoMapAnimator() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-8">
-      {/* Huge Keyword Banner for Home Page */}
-      <div className="text-center mb-16 max-w-4xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
-          Plot and Animate Latitude Longitude Data from Excel on Google Maps
-        </h1>
-        <h2 className="text-xl text-slate-600 leading-relaxed font-medium">
-          Upload Excel to Track and Animate GPS Routes with Time Filters
-        </h2>
-      </div>
-
       <div className="bg-white rounded-3xl shadow-xl shadow-slate-200 border border-slate-100 p-6 md:p-8 mb-12 relative overflow-hidden">
         {/* Icons Above Upload Area */}
         <div className="flex justify-center items-center gap-8 mb-6">
@@ -1624,6 +1614,7 @@ export default function GeoMapAnimator() {
           </div>
         )}
       </div>
+
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
         <h2 className="text-xl font-bold text-slate-900 mb-6">How to use it</h2>
         <div className="space-y-6">

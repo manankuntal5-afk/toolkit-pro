@@ -249,6 +249,45 @@ export default function DigitalFootprint() {
           </div>
         </div>
       )}
+
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <h2 className="text-xl font-bold text-slate-900 mb-6">How to use it</h2>
+        <div className="space-y-6">
+          <div className="flex gap-4">
+            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0 font-bold">
+              1
+            </div>
+            <div>
+              <h4 className="font-semibold text-slate-900">Enter Your Details</h4>
+              <p className="text-slate-600 text-sm mt-1">
+                Provide your name, email, or phone number to initiate the search.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0 font-bold">
+              2
+            </div>
+            <div>
+              <h4 className="font-semibold text-slate-900">Scan Digital Footprint</h4>
+              <p className="text-slate-600 text-sm mt-1">
+                Click the scan button to securely search public domain OSINT records for your information.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0 font-bold">
+              3
+            </div>
+            <div>
+              <h4 className="font-semibold text-slate-900">Review & Download PDF</h4>
+              <p className="text-slate-600 text-sm mt-1">
+                Analyze your exposed data, check risk levels, and export the report to PDF.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

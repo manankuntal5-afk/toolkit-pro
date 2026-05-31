@@ -485,7 +485,7 @@ export default function CommonDataFinder() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-        <h2 className="text-xl font-bold text-slate-900 mb-6">How to use</h2>
+        <h2 className="text-xl font-bold text-slate-900 mb-6">How to use it</h2>
         <div className="space-y-6">
           <div className="flex gap-4">
             <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 font-bold">
