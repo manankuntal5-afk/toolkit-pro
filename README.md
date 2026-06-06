@@ -1,20 +1,24 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# ToolBox Pro
 
-# Run and deploy your AI Studio app
+ToolBox Pro is a comprehensive suite of online utility tools designed to make your daily tasks easier. From PDF manipulation to image compression, metadata analysis, and geo-mapping, our tools run right in your browser.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/070a0a91-b290-4fbb-a035-a710ea62fabe
+*   **PDF to CSV/Excel**: Extract tables from PDF documents.
+*   **Image Compressor**: Reduce image file sizes securely.
+*   **Safe Link Scanner**: Check URLs for malicious content.
+*   **Digital Footprint Checker**: See what data is publicly associated with your email.
+*   **Geo Map Animator**: Plot coordinate files to Google Maps.
+*   ...and many more tools!
 
-## Run Locally
+## Performance and SEO
 
-**Prerequisites:**  Node.js
+This project uses modern web development practices:
+*   Built with React and Vite.
+*   Code Split using `React.lazy` and `Suspense` for faster initial loads.
+*   SEO optimized with `react-helmet-async` for clean meta tagging per tool.
 
+## Setup
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1.  \`npm install\`
+2.  \`npm run dev\`

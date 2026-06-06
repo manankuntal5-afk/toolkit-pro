@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { TOOLS } from "../constants";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -150,21 +151,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       document.head.appendChild(link);
     }
 
-    if (currentToolInfo) {
-      document.title =
-        (currentToolInfo as any).seoTitle ||
-        currentToolInfo.title ||
-        "ToolBox Pro";
-    } else {
-      document.title = "ToolBox Pro";
-    }
-    
     // Always set favicon to our new SVG
     link.href = "/favicon.svg";
   }, [currentToolInfo]);
 
+  const pageTitle = currentToolInfo 
+    ? ((currentToolInfo as any).seoTitle || currentToolInfo.title || "ToolBox Pro")
+    : "ToolBox Pro";
+  const metaDescription = currentToolInfo
+    ? currentToolInfo.whatItIs || "A powerful suite of online tools."
+    : "ToolBox Pro: Enhance your workflow with our smart utilities.";
+
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans">
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={metaDescription} />
+      </Helmet>
       {/* Header - smallpdf style */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">

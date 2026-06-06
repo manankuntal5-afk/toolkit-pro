@@ -1,5 +1,0 @@
-gemini-2.5-pro ERROR: {"error":{"code":429,"message":"You exceeded your current quota, please check your plan and billing 
-gemini-2.5-flash ERROR: {"error":{"code":429,"message":"You exceeded your current quota, please check your plan and billing 
-gemini-2.0-flash ERROR: {"error":{"code":429,"message":"You exceeded your current quota, please check your plan and billing 
-gemini-1.5-flash ERROR: {"error":{"code":404,"message":"models/gemini-1.5-flash is not found for API version v1beta, or is n
-gemini-1.0-pro ERROR: {"error":{"code":404,"message":"models/gemini-1.0-pro is not found for API version v1beta, or is not
