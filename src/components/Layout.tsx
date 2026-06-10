@@ -155,18 +155,30 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     link.href = "/favicon.svg";
   }, [currentToolInfo]);
 
-  const pageTitle = currentToolInfo 
-    ? ((currentToolInfo as any).seoTitle || currentToolInfo.title || "ToolBox Pro")
-    : "ToolBox Pro";
-  const metaDescription = currentToolInfo
-    ? currentToolInfo.whatItIs || "A powerful suite of online tools."
-    : "ToolBox Pro: Enhance your workflow with our smart utilities.";
+  const pageTitle = isArticleView && currentArticleInfo
+    ? currentArticleInfo.title
+    : currentToolInfo 
+      ? ((currentToolInfo as any).seoTitle || currentToolInfo.title || "ToolBox Pro")
+      : "ToolBox Pro";
+      
+  const metaDescription = isArticleView && currentArticleInfo
+    ? currentArticleInfo.summary || currentArticleInfo.content.slice(0, 150)
+    : currentToolInfo
+      ? currentToolInfo.whatItIs || "A powerful suite of online tools."
+      : "ToolBox Pro offers a comprehensive suite of online utility tools including PDF manipulation, Image Compression, Geo Mapping, and more to enhance your daily workflow.";
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans">
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={metaDescription} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:type" content={isArticleView ? "article" : "website"} />
+        {currentToolInfo && <meta property="og:image" content={currentToolInfo.image || "/favicon.svg"} />}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={metaDescription} />
       </Helmet>
       {/* Header - smallpdf style */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
